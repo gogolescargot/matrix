@@ -6,7 +6,7 @@
 /*   By: ggalon <ggalon@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/24 13:13:04 by ggalon            #+#    #+#             */
-/*   Updated: 2024/12/24 17:52:13 by ggalon           ###   ########.fr       */
+/*   Updated: 2024/12/24 17:53:34 by ggalon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,15 +19,15 @@ use vector::Vector;
 
 fn main()
 {
-	let vector0 = Vector::new([1, 2]);
+	let mut vector0 = Vector::new([1, 2]);
 	let vector1 = Vector::new([1, 2]);
 
-	let mut matrix0 = Matrix::new([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
-	let matrix1 = Matrix::new([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
+	// let mut matrix0 = Matrix::new([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
+	// let matrix1 = Matrix::new([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
 
 	vector0.add(&vector1);
 
-	matrix0.add(&matrix1);
+	// matrix0.add(&matrix1);
 
 	let mut vector2 = vector0 + vector1;
 
@@ -37,5 +37,5 @@ fn main()
 
 	vector2.print();
 
-	matrix0.print();
+	// matrix0.print();
 }
