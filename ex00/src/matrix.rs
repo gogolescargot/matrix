@@ -1,4 +1,17 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   matrix.rs                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ggalon <ggalon@student.42lyon.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/12/24 14:20:04 by ggalon            #+#    #+#             */
+/*   Updated: 2024/12/24 16:07:40 by ggalon           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 use std::fmt::Debug;
+use std::ops::AddAssign;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Matrix<K, const M: usize, const N: usize>
@@ -9,7 +22,7 @@ pub struct Matrix<K, const M: usize, const N: usize>
 	data: [[K; N]; M],
 }
 
-impl<K: Debug + Copy + Default, const M: usize, const N: usize> Matrix<K, M, N>
+impl<K: Debug + Copy + Default + AddAssign, const M: usize, const N: usize> Matrix<K, M, N>
 {
 	pub fn new(data: [[K; N]; M]) -> Self
 	{
@@ -22,9 +35,9 @@ impl<K: Debug + Copy + Default, const M: usize, const N: usize> Matrix<K, M, N>
 		Self
 		{
 			size_x,
-            size_y,
-            is_square,
-            data,
+			size_y,
+			is_square,
+			data,
 		}
 	}
 
@@ -32,7 +45,18 @@ impl<K: Debug + Copy + Default, const M: usize, const N: usize> Matrix<K, M, N>
 	{
 		for row in &self.data
 		{
-            println!("{:?}", row);
-        }
+			println!("{:?}", row);
+		}
+	}
+
+	pub fn add(&mut self, v: &Matrix<K, M, N>)
+	{
+		for (i, row) in self.data.iter_mut().enumerate()
+		{
+			for (j, elem) in row.iter_mut().enumerate()
+			{
+				*elem += v.data[i][j];
+			}
+		}
 	}
 }
