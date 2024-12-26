@@ -6,16 +6,15 @@
 /*   By: ggalon <ggalon@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/24 13:13:02 by ggalon            #+#    #+#             */
-/*   Updated: 2024/12/24 17:51:31 by ggalon           ###   ########.fr       */
+/*   Updated: 2024/12/26 11:08:09 by ggalon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-use std::ops::{Add, AddAssign, Deref, DerefMut, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
+use std::ops::{Add, AddAssign, Sub, SubAssign, Mul, MulAssign, Div, DivAssign};
 
 use crate::matrix::Matrix;
 use crate::traits::Traits;
 
-#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Vector<K, const N: usize>
 {
 	size: usize,

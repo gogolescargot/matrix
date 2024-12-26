@@ -6,12 +6,12 @@
 /*   By: ggalon <ggalon@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/24 16:58:30 by ggalon            #+#    #+#             */
-/*   Updated: 2024/12/24 17:43:27 by ggalon           ###   ########.fr       */
+/*   Updated: 2024/12/26 11:09:40 by ggalon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 use std::fmt::Debug;
-use std::ops::{Add, AddAssign, Deref, DerefMut, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
+use std::ops::{Add, AddAssign, Sub, SubAssign, Mul, MulAssign, Div, DivAssign};
 
 pub trait Traits:
 	Debug +
