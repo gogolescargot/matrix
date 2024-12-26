@@ -6,7 +6,7 @@
 /*   By: ggalon <ggalon@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/24 13:13:04 by ggalon            #+#    #+#             */
-/*   Updated: 2024/12/26 12:43:30 by ggalon           ###   ########.fr       */
+/*   Updated: 2024/12/26 14:12:33 by ggalon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,22 @@ mod matrix;
 mod vector;
 mod traits;
 
+use crate::traits::Traits;
+
 use matrix::Matrix;
 use vector::Vector;
+use std::ops::{Add, Mul};
+
+fn lerp<V>(u: V, v: V, t: f32) -> V
+where V: Mul<f32, Output = V> + Add<Output = V>
+{
+	if (t < 0. || t > 1.)
+	{
+		panic!("Third paramater need to be between 0 and 1");
+	}
+
+	return (u * t) + (v * (1. - t));
+}
 
 fn main()
 {
@@ -86,4 +100,20 @@ fn main()
 	println!("\nLinear Combination (2v1 - v2):");
 	let result = Vector::linear_combination(&vectors, &coefficients);
 	result.print();
+
+	// Test linear interpolation
+	println!("\n=== Testing Lerp Function ===\n");
+	
+	// Test with vectors
+	let v1 = Vector::new([0.0, 0.0]);
+	let v2 = Vector::new([10.0, 10.0]);
+	println!("\nVector lerp with t=0.5:");
+	lerp(v1, v2, 0.5).print();
+	
+	// Test with matrices
+	let m1 = Matrix::new([[0.0, 0.0], [0.0, 0.0]]);
+	let m2 = Matrix::new([[10.0, 10.0], [10.0, 10.0]]);
+	println!("\nMatrix lerp with t=0.5:");
+	lerp(m1, m2, 0.5).print();
+
 }

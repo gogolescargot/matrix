@@ -6,7 +6,7 @@
 /*   By: ggalon <ggalon@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/24 16:58:30 by ggalon            #+#    #+#             */
-/*   Updated: 2024/12/26 11:52:07 by ggalon           ###   ########.fr       */
+/*   Updated: 2024/12/26 14:12:50 by ggalon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,15 +26,15 @@ pub trait Traits:
 	Div<Output = Self> +
 	DivAssign {}
 
-impl<T> Traits for T where
-	T: Debug +
+impl<V> Traits for V where
+	V: Debug +
 	Default +
 	Copy +
-	Add<Output = T> +
+	Add<Output = V> +
 	AddAssign +
-	Sub<Output = T> +
+	Sub<Output = V> +
 	SubAssign +
-	Mul<Output = T> +
+	Mul<Output = V> +
 	MulAssign +
-	Div<Output = T> +
+	Div<Output = V> +
 	DivAssign {}
