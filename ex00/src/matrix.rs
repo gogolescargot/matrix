@@ -6,11 +6,11 @@
 /*   By: ggalon <ggalon@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/24 14:20:04 by ggalon            #+#    #+#             */
-/*   Updated: 2024/12/26 11:19:07 by ggalon           ###   ########.fr       */
+/*   Updated: 2024/12/26 11:47:33 by ggalon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-use std::ops::{Add, AddAssign, Sub, SubAssign, Mul, MulAssign, Div, DivAssign};
+use std::ops::{Add, AddAssign, Sub, SubAssign, Mul, MulAssign};
 use crate::traits::Traits;
 
 pub struct Matrix<K, const M: usize, const N: usize>
@@ -40,6 +40,11 @@ impl<K: Traits, const M: usize, const N: usize> Matrix<K, M, N>
 		}
 	}
 
+	pub fn clone(&self) -> Self
+	{
+		return Self::new(self.data);
+	}
+
 	pub fn print(&self)
 	{
 		for row in &self.data
@@ -50,25 +55,37 @@ impl<K: Traits, const M: usize, const N: usize> Matrix<K, M, N>
 
 	pub fn add(&mut self, v: &Matrix<K, M, N>)
 	{
-		for (i, row) in self.data.iter_mut().enumerate()
+		for i in 0..M
 		{
-			for (j, elem) in row.iter_mut().enumerate()
+			for j in 0..N
 			{
-				*elem += v.data[i][j];
+				self.data[i][j] += v.data[i][j];
 			}
 		}
 	}
 
 	pub fn sub(&mut self, v: &Matrix<K, M, N>)
 	{
-		for (i, row) in self.data.iter_mut().enumerate()
+		for i in 0..M
 		{
-			for (j, elem) in row.iter_mut().enumerate()
+			for j in 0..N
 			{
-				*elem -= v.data[i][j];
+				self.data[i][j] -= v.data[i][j];
 			}
 		}
 	}
+
+	pub fn scl(&mut self, a: K)
+	{
+		for i in 0..N
+		{
+			for j in 0..M
+			{
+				self.data[i][j] *= a;
+			}
+		}
+	}
+
 }
 
 impl<K: Traits, const M: usize, const N: usize> Add for Matrix<K, M, N>
@@ -79,11 +96,11 @@ impl<K: Traits, const M: usize, const N: usize> Add for Matrix<K, M, N>
 	{
 		let mut result = [[K::default(); N]; M];
 
-		for (i, row) in self.data.iter().enumerate()
+		for i in 0..M
 		{
-			for (j, elem) in row.iter().enumerate()
+			for j in 0..N
 			{
-				result[i][j] = *elem + v.data[i][j];
+				result[i][j] = self.data[i][j] + v.data[i][j];
 			}
 		}
 
@@ -95,11 +112,11 @@ impl<K: Traits, const M: usize, const N: usize> AddAssign for Matrix<K, M, N>
 {
 	fn add_assign(&mut self, v: Self)
 	{
-		for (i, row) in self.data.iter_mut().enumerate()
+		for i in 0..M
 		{
-			for (j, elem) in row.iter_mut().enumerate()
+			for j in 0..N
 			{
-				*elem += v.data[i][j];
+				self.data[i][j] += v.data[i][j];
 			}
 		}
 	}
@@ -113,11 +130,11 @@ impl<K: Traits, const M: usize, const N: usize> Sub for Matrix<K, M, N>
 	{
 		let mut result = [[K::default(); N]; M];
 
-		for (i, row) in self.data.iter().enumerate()
+		for i in 0..M
 		{
-			for (j, elem) in row.iter().enumerate()
+			for j in 0..N
 			{
-				result[i][j] = *elem - v.data[i][j];
+				result[i][j] = self.data[i][j] - v.data[i][j];
 			}
 		}
 
@@ -129,11 +146,45 @@ impl<K: Traits, const M: usize, const N: usize> SubAssign for Matrix<K, M, N>
 {
 	fn sub_assign(&mut self, v: Self)
 	{
-		for (i, row) in self.data.iter_mut().enumerate()
+		for i in 0..M
 		{
-			for (j, elem) in row.iter_mut().enumerate()
+			for j in 0..N
 			{
-				*elem -= v.data[i][j];
+				self.data[i][j] -= v.data[i][j];
+			}
+		}
+	}
+}
+
+impl<K: Traits, const M: usize, const N: usize> Mul<K> for Matrix<K, M, N>
+{
+	type Output = Self;
+
+	fn mul(self, a: K) -> Self::Output
+	{
+		let mut result: [[K; N]; M] = [[K::default(); N]; M];
+
+		for i in 0..M
+		{
+			for j in 0..N
+			{
+				result[i][j] = self.data[i][j] * a;
+			}
+		}
+
+		return Self::new(result);
+	}
+}
+
+impl<K: Traits, const M: usize, const N: usize> MulAssign<K> for Matrix<K, M, N>
+{
+	fn mul_assign(&mut self, a: K)
+	{
+		for i in 0..M
+		{
+			for j in 0..N	
+			{
+				self.data[i][j] *= a;
 			}
 		}
 	}
