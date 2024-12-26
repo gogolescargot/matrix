@@ -6,7 +6,7 @@
 /*   By: ggalon <ggalon@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/24 13:13:02 by ggalon            #+#    #+#             */
-/*   Updated: 2024/12/26 11:49:20 by ggalon           ###   ########.fr       */
+/*   Updated: 2024/12/26 12:40:57 by ggalon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,25 @@ impl<K: Traits, const N: usize> Vector<K, N>
 			self.data[i] *= a;
 		}
 	}
+	
+	pub fn linear_combination(u: &[Vector<K, N>], coefs: &[K]) -> Vector<K, N>
+	{
+		if u.len() != coefs.len()
+		{
+			panic!("Error: Arrays sizes are different");
+		}
+
+		let mut result = Vector::new([K::default(); N]);
+
+		for i in 0..u.len()
+		{
+			let mut temp = u[i].clone();
+			temp *= coefs[i];
+			result += temp;
+		}
+		
+		return result;
+	}
 
 }
 
@@ -88,14 +107,14 @@ impl<K: Traits, const N: usize> Add for Vector<K, N>
 
 	fn add(self, v: Self) -> Self::Output
 	{
-		let mut result = [K::default(); N];
+		let mut result = Self::new([K::default(); N]);
 
 		for i in 0..N
 		{
-			result[i] = self.data[i] + v.data[i];
+			result.data[i] = self.data[i] + v.data[i];
 		}
 
-		return Self::new(result);
+		return result;
 	}
 }
 
@@ -116,14 +135,14 @@ impl<K: Traits, const N: usize> Sub for Vector<K, N>
 
 	fn sub(self, v: Self) -> Self::Output
 	{
-		let mut result = [K::default(); N];
+		let mut result = Self::new([K::default(); N]);
 
 		for i in 0..N
 		{
-			result[i] = self.data[i] - v.data[i];
+			result.data[i] = self.data[i] - v.data[i];
 		}
 
-		return Self::new(result);
+		return result;
 	}
 }
 
@@ -144,14 +163,14 @@ impl<K: Traits, const N: usize> Mul<K> for Vector<K, N>
 
 	fn mul(self, a: K) -> Self::Output
 	{
-		let mut result = [K::default(); N];
+		let mut result = Self::new([K::default(); N]);
 
 		for i in 0..N
 		{
-			result[i] = self.data[i] * a;
+			result.data[i] = self.data[i] * a;
 		}
 
-		return Self::new(result);
+		return result;
 	}
 }
 

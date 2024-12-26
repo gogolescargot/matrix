@@ -6,7 +6,7 @@
 /*   By: ggalon <ggalon@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/24 14:20:04 by ggalon            #+#    #+#             */
-/*   Updated: 2024/12/26 11:47:33 by ggalon           ###   ########.fr       */
+/*   Updated: 2024/12/26 12:34:49 by ggalon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,17 +94,17 @@ impl<K: Traits, const M: usize, const N: usize> Add for Matrix<K, M, N>
 
 	fn add(self, v: Self) -> Self::Output
 	{
-		let mut result = [[K::default(); N]; M];
+		let mut result = Self::new([[K::default(); N]; M]);
 
 		for i in 0..M
 		{
 			for j in 0..N
 			{
-				result[i][j] = self.data[i][j] + v.data[i][j];
+				result.data[i][j] = self.data[i][j] + v.data[i][j];
 			}
 		}
 
-		return Self::new(result);
+		return result;
 	}
 }
 
@@ -128,17 +128,17 @@ impl<K: Traits, const M: usize, const N: usize> Sub for Matrix<K, M, N>
 
 	fn sub(self, v: Self) -> Self::Output
 	{
-		let mut result = [[K::default(); N]; M];
+		let mut result = Self::new([[K::default(); N]; M]);
 
 		for i in 0..M
 		{
 			for j in 0..N
 			{
-				result[i][j] = self.data[i][j] - v.data[i][j];
+				result.data[i][j] = self.data[i][j] - v.data[i][j];
 			}
 		}
 
-		return Self::new(result);
+		return result;
 	}
 }
 
@@ -162,17 +162,17 @@ impl<K: Traits, const M: usize, const N: usize> Mul<K> for Matrix<K, M, N>
 
 	fn mul(self, a: K) -> Self::Output
 	{
-		let mut result: [[K; N]; M] = [[K::default(); N]; M];
+		let mut result = Self::new([[K::default(); N]; M]);
 
 		for i in 0..M
 		{
 			for j in 0..N
 			{
-				result[i][j] = self.data[i][j] * a;
+				result.data[i][j] = self.data[i][j] * a;
 			}
 		}
 
-		return Self::new(result);
+		return result;
 	}
 }
 

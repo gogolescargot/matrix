@@ -6,7 +6,7 @@
 /*   By: ggalon <ggalon@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/24 13:13:04 by ggalon            #+#    #+#             */
-/*   Updated: 2024/12/26 11:51:40 by ggalon           ###   ########.fr       */
+/*   Updated: 2024/12/26 12:43:30 by ggalon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,4 +68,22 @@ fn main()
 	println!("\nVector to Matrix Conversion (vector1):");
 	let vec_as_matrix = vector1.vtom();
 	vec_as_matrix.print();
+
+	// Test linear combination
+	println!("\n=== Testing Linear Combination ===\n");
+
+	let v1 = Vector::new([5, 2]);
+	let v2 = Vector::new([3, 4]);
+	let vectors = [v1, v2];
+	let coefficients = [2, -1];
+	
+	println!("Vector 1:");
+	vectors[0].print();
+	println!("\nVector 2:");
+	vectors[1].print();
+	println!("\nCoefficients: {:?}", coefficients);
+	
+	println!("\nLinear Combination (2v1 - v2):");
+	let result = Vector::linear_combination(&vectors, &coefficients);
+	result.print();
 }
