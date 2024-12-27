@@ -6,7 +6,7 @@
 /*   By: ggalon <ggalon@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/24 13:13:02 by ggalon            #+#    #+#             */
-/*   Updated: 2024/12/26 14:12:54 by ggalon           ###   ########.fr       */
+/*   Updated: 2024/12/27 15:02:28 by ggalon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@ use crate::traits::Traits;
 
 pub struct Vector<K, const N: usize>
 {
-	size: usize,
 	data: [K; N]
 }
 
@@ -25,12 +24,9 @@ impl<K: Traits, const N: usize> Vector<K, N>
 {
 	pub fn new(data: [K; N]) -> Self
 	{
-		let size = data.len();
-
 		Self
 		{
-			data,
-			size,
+			data
 		}
 	}
 
@@ -97,6 +93,57 @@ impl<K: Traits, const N: usize> Vector<K, N>
 		}
 		
 		return result;
+	}
+
+	pub fn dot(&self, v: Vector<K, N>) -> K
+	{
+		let mut result = K::default();
+
+		for i in 0..self.data.len()
+		{
+			result += self.data[i] * v.data[i];
+		}
+		
+		return result;
+	}
+
+	pub fn norm_1(&mut self) -> f32
+	{
+		let mut result = f32::default();
+
+		for i in 0..self.data.len()
+		{
+			result += self.data[i].into().abs()
+		}
+
+		return result;
+	}
+
+	pub fn norm_2(&mut self) -> f32
+	{
+		let mut result = f32::default();
+
+		for i in 0..self.data.len()
+		{
+			result += self.data[i].into().powi(2);
+		}
+
+		return result.sqrt();
+	}
+
+	pub fn norm_inf(&mut self) -> f32
+	{
+		let mut max: f32 = self.data[0].into().abs();
+
+		for i in 1..self.data.len()
+		{
+			if max < self.data[i].into().abs()
+			{
+				max = self.data[i].into().abs();
+			}
+		}
+
+		return max;
 	}
 
 }
