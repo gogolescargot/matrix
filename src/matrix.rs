@@ -6,11 +6,12 @@
 /*   By: ggalon <ggalon@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/24 14:20:04 by ggalon            #+#    #+#             */
-/*   Updated: 2024/12/31 13:24:13 by ggalon           ###   ########.fr       */
+/*   Updated: 2024/12/31 13:47:34 by ggalon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 use std::ops::{Add, AddAssign, Sub, SubAssign, Mul, MulAssign};
+use std::cmp::min;
 
 use crate::vector::Vector;
 use crate::traits::Traits;
@@ -118,6 +119,34 @@ impl<K: Traits, const M: usize, const N: usize> Matrix<K, M, N>
 			}
 		}
 		return result;
+	}
+
+	pub fn trace(&self) -> K
+	{
+
+		let mut result = K::default();
+		
+		for i in 0..min(M, N)
+		{
+			result += self.data[i][i];
+		}
+
+		return result;
+	}
+
+	pub fn transpose(&self) -> Matrix<K, N, M>
+	{
+		let mut result: Matrix<K, N, M> = Matrix::new([[K::default(); M]; N]);
+
+		for i in 0..M
+		{
+			for j in 0..N
+			{
+				result.data[j][i] = self.data[i][j];
+			}
+		}
+
+		return result
 	}
 
 }
