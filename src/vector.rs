@@ -6,7 +6,7 @@
 /*   By: ggalon <ggalon@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/24 13:13:02 by ggalon            #+#    #+#             */
-/*   Updated: 2024/12/27 15:02:28 by ggalon           ###   ########.fr       */
+/*   Updated: 2024/12/31 13:22:18 by ggalon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,12 @@ impl<K: Traits, const N: usize> Vector<K, N>
 	pub fn clone(&self) -> Self
 	{
 		return Self::new(self.data);
+	}
+
+
+	pub fn get_data(&self) -> &[K; N]
+	{
+		return &self.data;
 	}
 
 	pub fn vtom(&self) -> Matrix<K, N, 1>
@@ -107,9 +113,9 @@ impl<K: Traits, const N: usize> Vector<K, N>
 		return result;
 	}
 
-	pub fn norm_1(&mut self) -> f32
+	pub fn norm_1(&self) -> f64
 	{
-		let mut result = f32::default();
+		let mut result = f64::default();
 
 		for i in 0..self.data.len()
 		{
@@ -119,9 +125,9 @@ impl<K: Traits, const N: usize> Vector<K, N>
 		return result;
 	}
 
-	pub fn norm_2(&mut self) -> f32
+	pub fn norm_2(&self) -> f64
 	{
-		let mut result = f32::default();
+		let mut result = f64::default();
 
 		for i in 0..self.data.len()
 		{
@@ -131,9 +137,9 @@ impl<K: Traits, const N: usize> Vector<K, N>
 		return result.sqrt();
 	}
 
-	pub fn norm_inf(&mut self) -> f32
+	pub fn norm_inf(&self) -> f64
 	{
-		let mut max: f32 = self.data[0].into().abs();
+		let mut max: f64 = self.data[0].into().abs();
 
 		for i in 1..self.data.len()
 		{
@@ -144,6 +150,16 @@ impl<K: Traits, const N: usize> Vector<K, N>
 		}
 
 		return max;
+	}
+
+	pub fn angle_cos(u: &Vector<K, N>, v: &Vector<K, N>) -> f64
+	{
+		return (u.dot(v.clone())).into() / (u.norm_2() * v.norm_2());
+	}
+
+	pub fn cross_product(u: &Vector<K, 3>, v: &Vector<K, 3>) -> Vector<K, 3>
+	{
+		return Vector::new([(u.data[1] * v.data[2]) - (u.data[2] * v.data[1]), (u.data[2] * v.data[0]) - (u.data[0] * v.data[2]), (u.data[0] * v.data[1]) - (u.data[1] * v.data[0])]);
 	}
 
 }

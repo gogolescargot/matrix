@@ -6,11 +6,13 @@
 /*   By: ggalon <ggalon@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/24 14:20:04 by ggalon            #+#    #+#             */
-/*   Updated: 2024/12/26 12:34:49 by ggalon           ###   ########.fr       */
+/*   Updated: 2024/12/31 13:24:13 by ggalon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 use std::ops::{Add, AddAssign, Sub, SubAssign, Mul, MulAssign};
+
+use crate::vector::Vector;
 use crate::traits::Traits;
 
 pub struct Matrix<K, const M: usize, const N: usize>
@@ -77,13 +79,45 @@ impl<K: Traits, const M: usize, const N: usize> Matrix<K, M, N>
 
 	pub fn scl(&mut self, a: K)
 	{
-		for i in 0..N
+		for i in 0..M
 		{
-			for j in 0..M
+			for j in 0..N
 			{
 				self.data[i][j] *= a;
 			}
 		}
+	}
+
+	pub fn mul_mat<const P: usize>(&self, mat: Matrix<K, N, P>) -> Matrix<K, M, P>
+	{
+		let mut result: Matrix<K, M, P> = Matrix::new([[K::default(); P]; M]);
+
+		for i in 0..M
+		{
+			for j in 0..P
+			{
+				for k in 0..N
+				{
+					result.data[i][j] += self.data[i][k] * mat.data[k][j];
+				}
+			}
+		}
+
+		return result;
+	}
+
+	pub fn mul_vec(&self, vec: Vector<K, N>) -> Matrix<K, M, 1>
+	{
+		let mut result: Matrix<K, M, 1> = Matrix::new([[K::default(); 1]; M]);
+
+		for i in 0..M
+		{
+			for k in 0..N
+			{
+				result.data[i][0] += self.data[i][k] * vec.get_data()[k];
+			}
+		}
+		return result;
 	}
 
 }
@@ -187,5 +221,46 @@ impl<K: Traits, const M: usize, const N: usize> MulAssign<K> for Matrix<K, M, N>
 				self.data[i][j] *= a;
 			}
 		}
+	}
+}
+
+impl<K: Traits, const M: usize, const N: usize, const P: usize> Mul<Matrix<K, N, P>> for Matrix<K, M, N>
+{
+	type Output = Matrix<K, M, P>;
+
+	fn mul(self, v: Matrix<K, N, P>) -> Matrix<K, M, P>
+	{
+		let mut result: Matrix<K, M, P> = Matrix::new([[K::default(); P]; M]);
+
+		for i in 0..M
+		{
+			for j in 0..P
+			{
+				for k in 0..N
+				{
+					result.data[i][j] += self.data[i][k] * v.data[k][j];
+				}
+			}
+		}
+		return result;
+	}
+}
+
+impl<K: Traits, const M: usize, const N: usize> Mul<Vector<K, N>> for Matrix<K, M, N>
+{
+	type Output = Matrix<K, M, 1>;
+
+	fn mul(self, v: Vector<K, N>) -> Matrix<K, M, 1>
+	{
+		let mut result: Matrix<K, M, 1> = Matrix::new([[K::default(); 1]; M]);
+
+		for i in 0..M
+		{
+			for k in 0..N
+			{
+				result.data[i][0] += self.data[i][k] * v.get_data()[k];
+			}
+		}
+		return result;
 	}
 }

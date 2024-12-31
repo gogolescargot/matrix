@@ -6,7 +6,7 @@
 /*   By: ggalon <ggalon@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/24 13:13:04 by ggalon            #+#    #+#             */
-/*   Updated: 2024/12/27 15:05:06 by ggalon           ###   ########.fr       */
+/*   Updated: 2024/12/31 13:26:55 by ggalon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,4 +147,56 @@ fn main()
     
     // Test inf norm (maximum absolute value)
     println!("Inf norm (Maximum): {}", v_norms.norm_inf());  // Should be 3.0
+
+    println!("\n=== Angle Cosine Tests ===");
+    
+    // Test parallel vectors (should be 1.0)
+    let v1 = Vector::new([1.0, 0.0, 0.0]);
+    let v2 = Vector::new([2.0, 0.0, 0.0]);
+    println!("Parallel vectors cos angle: {}", Vector::angle_cos(&v1, &v2));
+    
+    // Test perpendicular vectors (should be 0.0)
+    let v3 = Vector::new([1.0, 0.0, 0.0]);
+    let v4 = Vector::new([0.0, 1.0, 0.0]);
+    println!("Perpendicular vectors cos angle: {}", Vector::angle_cos(&v3, &v4));
+    
+    // Test opposite vectors (should be -1.0)
+    let v5 = Vector::new([1.0, 0.0, 0.0]);
+    let v6 = Vector::new([-1.0, 0.0, 0.0]);
+    println!("Opposite vectors cos angle: {}", Vector::angle_cos(&v5, &v6));
+    
+    // Test 45-degree angle vectors (should be ~0.707)
+    let v7 = Vector::new([1.0, 0.0, 0.0]);
+    let v8 = Vector::new([1.0, 1.0, 0.0]);
+    println!("45-degree angle vectors cos angle: {}", Vector::angle_cos(&v7, &v8));
+
+	println!("\n=== Cross Product Tests ===");
+    
+    // Test i × j = k (unit vectors)
+    let i = Vector::new([1.0, 0.0, 0.0]);
+    let j = Vector::new([0.0, 1.0, 0.0]);
+    let k = Vector::<f64, 3>::cross_product(&i, &j);
+    println!("i × j = ");
+    k.print();  // Should be [0, 0, 1]
+    
+    // Test anti-commutative property (j × i = -k)
+    let k_opposite = Vector::<f64, 3>::cross_product(&j, &i);
+    println!("j × i = ");
+    k_opposite.print();  // Should be [0, 0, -1]
+
+	let mut m6 = Matrix::new([[1., 2., 3.], [4., 5., 6.]]);
+	let mut m7 = Matrix::new([[1., 2.], [4., 5.], [7., 8.]]);
+
+    let m8 = m6.clone() * m7.clone();
+
+	m8.print();
+
+	m6.print();
+
+	v6.print();
+
+	let m9 = m6.clone() * v6.clone();
+
+	m9.print();
+
 }
