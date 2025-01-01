@@ -6,7 +6,7 @@
 /*   By: ggalon <ggalon@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/24 16:58:30 by ggalon            #+#    #+#             */
-/*   Updated: 2024/12/27 17:36:06 by ggalon           ###   ########.fr       */
+/*   Updated: 2025/01/01 17:06:02 by ggalon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,9 @@ pub trait Traits:
 	Mul<Output = Self> +
 	MulAssign +
 	Div<Output = Self> +
-	DivAssign {}
+	DivAssign +
+	PartialEq +
+	PartialOrd{}
 
 impl<V> Traits for V where
 	V: Debug +
@@ -39,4 +41,6 @@ impl<V> Traits for V where
 	Mul<Output = V> +
 	MulAssign +
 	Div<Output = V> +
-	DivAssign {}
+	DivAssign +
+	PartialEq +
+	PartialOrd{}

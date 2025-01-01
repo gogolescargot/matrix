@@ -6,7 +6,7 @@
 /*   By: ggalon <ggalon@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/24 14:20:04 by ggalon            #+#    #+#             */
-/*   Updated: 2024/12/31 13:47:34 by ggalon           ###   ########.fr       */
+/*   Updated: 2025/01/01 18:59:28 by ggalon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,7 +146,74 @@ impl<K: Traits, const M: usize, const N: usize> Matrix<K, M, N>
 			}
 		}
 
-		return result
+		return result;
+	}
+
+	pub fn row_echelon(&self) -> Matrix<K, M, N>
+	{
+		let mut result: Matrix<K, M, N> = Matrix::new(self.data);
+
+		let mut pivot_row = 0;
+
+		for col in 0..N
+		{
+			if pivot_row >= M
+			{
+				break;
+			}
+			
+			// Get the max row and swap
+
+			let mut max_row: usize = pivot_row;
+
+			for i in pivot_row + 1..M
+			{
+				if result.data[i][col] > result.data[max_row][col]
+				{
+					max_row = i;
+				}
+			}
+
+			if result.data[pivot_row][col] == K::default()
+			{
+				continue;
+			}
+
+			if max_row != pivot_row
+			{
+				result.data.swap(pivot_row, max_row);
+			}
+
+			// Normalize the pivot row
+
+			if result.data[pivot_row][col] != K::default()
+			{
+				let pivot = result.data[pivot_row][col];
+				
+				for j in	col..N
+				{
+					result.data[pivot_row][j] /= pivot;
+				}
+			}
+
+			// Cancel the elements below
+
+			for i in pivot_row + 1..M
+			{
+				let factor = result.data[i][col];
+				
+				for j in col..N
+				{
+					result.data[i][j] -= factor * result.data[pivot_row][j]
+				}
+			}
+
+			pivot_row += 1;
+			
+		}
+
+		return result;
+
 	}
 
 }
