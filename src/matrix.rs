@@ -6,7 +6,7 @@
 /*   By: ggalon <ggalon@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/24 14:20:04 by ggalon            #+#    #+#             */
-/*   Updated: 2025/01/02 14:38:32 by ggalon           ###   ########.fr       */
+/*   Updated: 2025/01/02 16:02:18 by ggalon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -222,6 +222,72 @@ impl<K: Traits, const M: usize, const N: usize> Matrix<K, M, N>
 	}
 
 }
+
+impl<K: Traits, const M: usize> Matrix<K, M, M>
+{
+	
+	pub fn determinant(&self) -> K
+	{
+		if M == 0
+		{
+			return K::from(1.);
+		}
+		else if M == 1
+		{
+			return self.data[0][0];
+		}
+		else if M == 2
+		{
+			return self.data[0][0] * self.data[1][1] - self.data[0][1] * self.data[1][0];
+		}
+		else if M == 3
+		{
+			return self.data[0][0] * (self.data[1][1] * self.data[2][2] - self.data[1][2] * self.data[2][1])
+			- self.data[0][1] * (self.data[1][0] * self.data[2][2] - self.data[1][2] * self.data[2][0])
+			+ self.data[0][2] * (self.data[1][0] * self.data[2][1] - self.data[1][1] * self.data[2][0]);
+		}
+		else if M == 4
+		{
+			let mut result = K::default();
+
+			for i in 0..4
+			{
+				let mut submatrix = Matrix::new([[K::default(); 3]; 3]);
+		
+				for j in 1..4
+				{
+					let mut col = 0;
+
+					for k in 0..4
+					{
+						if k != i
+						{
+							submatrix.data[j - 1][col] = self.data[j][k];
+							col += 1;
+						}
+					}
+				}
+
+				if i % 2 == 0
+				{
+					result += self.data[0][i] * submatrix.determinant();
+				}
+				else
+				{
+					result -= self.data[0][i] * submatrix.determinant();
+				}
+			}
+
+			return result;
+		}
+		else
+		{
+			panic!("Error: Matrix max size is 4x4");
+		}
+	
+	}
+}
+
 
 impl<K: Traits, const M: usize, const N: usize> Add for Matrix<K, M, N>
 {

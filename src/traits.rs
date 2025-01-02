@@ -6,7 +6,7 @@
 /*   By: ggalon <ggalon@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/24 16:58:30 by ggalon            #+#    #+#             */
-/*   Updated: 2025/01/01 17:06:02 by ggalon           ###   ########.fr       */
+/*   Updated: 2025/01/02 15:11:33 by ggalon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ pub trait Traits:
 	Debug +
 	Default +
 	Copy +
+	From<f64> +
 	Into<f64> +
 	Add<Output = Self> +
 	AddAssign +
@@ -33,6 +34,7 @@ impl<V> Traits for V where
 	V: Debug +
 	Default +
 	Copy +
+	From<f64> +
 	Into<f64> +
 	Add<Output = V> +
 	AddAssign +
