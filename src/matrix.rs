@@ -6,7 +6,7 @@
 /*   By: ggalon <ggalon@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/24 14:20:04 by ggalon            #+#    #+#             */
-/*   Updated: 2025/01/01 18:59:28 by ggalon           ###   ########.fr       */
+/*   Updated: 2025/01/02 14:38:32 by ggalon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,7 +151,7 @@ impl<K: Traits, const M: usize, const N: usize> Matrix<K, M, N>
 
 	pub fn row_echelon(&self) -> Matrix<K, M, N>
 	{
-		let mut result: Matrix<K, M, N> = Matrix::new(self.data);
+		let mut result: Matrix<K, M, N> = self.clone();
 
 		let mut pivot_row = 0;
 
@@ -168,7 +168,7 @@ impl<K: Traits, const M: usize, const N: usize> Matrix<K, M, N>
 
 			for i in pivot_row + 1..M
 			{
-				if result.data[i][col] > result.data[max_row][col]
+				if result.data[i][col].into().abs() > result.data[max_row][col].into().abs()
 				{
 					max_row = i;
 				}
@@ -198,8 +198,13 @@ impl<K: Traits, const M: usize, const N: usize> Matrix<K, M, N>
 
 			// Cancel the elements below
 
-			for i in pivot_row + 1..M
+			for i in 0..M
 			{
+				if i == pivot_row
+				{
+					continue;
+				}
+				
 				let factor = result.data[i][col];
 				
 				for j in col..N
