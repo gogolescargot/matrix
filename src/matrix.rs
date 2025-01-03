@@ -6,7 +6,7 @@
 /*   By: ggalon <ggalon@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/24 14:20:04 by ggalon            #+#    #+#             */
-/*   Updated: 2025/01/03 17:18:45 by ggalon           ###   ########.fr       */
+/*   Updated: 2025/01/03 18:26:39 by ggalon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -221,6 +221,28 @@ impl<K: Traits, const M: usize, const N: usize> Matrix<K, M, N>
 
 	}
 
+
+	pub fn rank(&self) -> usize
+	{
+		let copy = self.row_echelon();
+
+		let mut result: usize = usize::default();
+
+		for i in 0..M
+		{
+			for j in 0..N
+			{
+				if copy.data[i][j] != K::default()
+				{
+					result += 1;
+					
+					break;
+				}
+			}
+		}
+		return result;
+	}
+
 }
 
 impl<K: Traits, const N: usize> Matrix<K, N, N>
@@ -322,7 +344,7 @@ impl<K: Traits, const N: usize> Matrix<K, N, N>
 
 			if base.data[pivot_row][col] == K::default()
 			{
-				continue;
+				panic!("Matrix is singular, can't compute inverse");
 			}
 
 			if max_row != pivot_row
