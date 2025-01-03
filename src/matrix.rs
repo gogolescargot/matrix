@@ -6,7 +6,7 @@
 /*   By: ggalon <ggalon@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/24 14:20:04 by ggalon            #+#    #+#             */
-/*   Updated: 2025/01/02 16:02:18 by ggalon           ###   ########.fr       */
+/*   Updated: 2025/01/03 17:18:45 by ggalon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -223,30 +223,30 @@ impl<K: Traits, const M: usize, const N: usize> Matrix<K, M, N>
 
 }
 
-impl<K: Traits, const M: usize> Matrix<K, M, M>
+impl<K: Traits, const N: usize> Matrix<K, N, N>
 {
 	
 	pub fn determinant(&self) -> K
 	{
-		if M == 0
+		if N == 0
 		{
 			return K::from(1.);
 		}
-		else if M == 1
+		else if N == 1
 		{
 			return self.data[0][0];
 		}
-		else if M == 2
+		else if N == 2
 		{
 			return self.data[0][0] * self.data[1][1] - self.data[0][1] * self.data[1][0];
 		}
-		else if M == 3
+		else if N == 3
 		{
 			return self.data[0][0] * (self.data[1][1] * self.data[2][2] - self.data[1][2] * self.data[2][1])
 			- self.data[0][1] * (self.data[1][0] * self.data[2][2] - self.data[1][2] * self.data[2][0])
 			+ self.data[0][2] * (self.data[1][0] * self.data[2][1] - self.data[1][1] * self.data[2][0]);
 		}
-		else if M == 4
+		else if N == 4
 		{
 			let mut result = K::default();
 
@@ -286,6 +286,90 @@ impl<K: Traits, const M: usize> Matrix<K, M, M>
 		}
 	
 	}
+
+	pub fn inverse(&self) -> Matrix<K, N, N>
+	{
+
+		let mut base: Matrix<K, N, N> = self.clone();
+		
+		let mut idtt: Matrix<K, N, N> = Matrix::new([[K::default(); N]; N]);
+
+		for i in 0..N
+		{
+			idtt.data[i][i] = K::from(1.);
+		}
+
+		let mut pivot_row = 0;
+
+		for col in 0..N
+		{
+			if pivot_row >= N
+			{
+				break;
+			}
+			
+			// Get the max row and swap
+
+			let mut max_row: usize = pivot_row;
+
+			for i in pivot_row + 1..N
+			{
+				if base.data[i][col].into().abs() > base.data[max_row][col].into().abs()
+				{
+					max_row = i;
+				}
+			}
+
+			if base.data[pivot_row][col] == K::default()
+			{
+				continue;
+			}
+
+			if max_row != pivot_row
+			{
+				base.data.swap(pivot_row, max_row);
+				idtt.data.swap(pivot_row, max_row);
+			}
+
+			// Normalize the pivot row
+
+			if base.data[pivot_row][col] != K::default()
+			{
+				let pivot = base.data[pivot_row][col];
+				
+				for j in	0..N
+				{
+					base.data[pivot_row][j] /= pivot;
+					idtt.data[pivot_row][j] /= pivot;
+				}
+			}
+
+			// Cancel the elements
+
+			for i in 0..N
+			{
+				if i == pivot_row
+				{
+					continue;
+				}
+				
+				let factor: K = base.data[i][col];
+				
+				for j in 0..N
+				{
+					base.data[i][j] -= factor * base.data[pivot_row][j];
+					idtt.data[i][j] -= factor * idtt.data[pivot_row][j];
+				}
+			}
+
+			pivot_row += 1;
+			
+		}
+		
+		return idtt;
+
+	}
+
 }
 
 
