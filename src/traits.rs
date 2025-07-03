@@ -11,14 +11,28 @@
 /* ************************************************************************** */
 
 use std::fmt::Debug;
-use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
+
+pub trait MulAdd<A = Self, B = Self> {
+	type Output;
+
+	fn mul_add(self, a: A, b: B) -> Self::Output;
+}
+
+impl MulAdd for f32 {
+	type Output = f32;
+
+	fn mul_add(self, a: f32, b: f32) -> Self::Output {
+		f32::mul_add(self, a, b)
+	}
+}
 
 pub trait Traits:
 	Debug
 	+ Default
 	+ Copy
-	+ From<f64>
-	+ Into<f64>
+	+ From<f32>
+	+ Into<f32>
 	+ Add<Output = Self>
 	+ AddAssign
 	+ Sub<Output = Self>
@@ -29,6 +43,8 @@ pub trait Traits:
 	+ DivAssign
 	+ PartialEq
 	+ PartialOrd
+	+ MulAdd<Output = Self>
+	+ Neg<Output = Self>
 {
 }
 
@@ -36,8 +52,8 @@ impl<V> Traits for V where
 	V: Debug
 		+ Default
 		+ Copy
-		+ From<f64>
-		+ Into<f64>
+		+ From<f32>
+		+ Into<f32>
 		+ Add<Output = V>
 		+ AddAssign
 		+ Sub<Output = V>
@@ -48,5 +64,7 @@ impl<V> Traits for V where
 		+ DivAssign
 		+ PartialEq
 		+ PartialOrd
+		+ MulAdd<Output = Self>
+		+ Neg<Output = Self>
 {
 }

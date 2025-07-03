@@ -1,115 +1,153 @@
+use crate::lerp;
 use crate::matrix::Matrix;
-use crate::vector::{lerp, Vector};
+use crate::vector::Vector;
 
 #[cfg(test)]
 
-fn assert_approx_eq(a: f64, b: f64) {
+fn assert_approx_eq(a: f32, b: f32) {
 	assert!(
-		(a - b).abs() < 1e-9,
-		"assertion failed: `(left ≈ right)` (left: `{}`, right: `{}`)",
+		(a - b).abs() < 1e-6,
+		"assertion failed: `(left != right)` (left: `{}`, right: `{}`)",
 		a,
 		b
 	);
 }
 
 #[test]
-fn test_vector_creation() {
-	let v = Vector::new([1., 2., 3.]);
-	assert_eq!(v.data, [1., 2., 3.]);
-}
-
-#[test]
-fn test_vector_addition() {
-	let mut v1 = Vector::new([1., 2., 3.]);
-	let v2 = Vector::new([4., 5., 6.]);
+fn test_vector_add() {
+	let mut v1 = Vector::new([2., 3.]);
+	let v2 = Vector::new([5., 7.]);
 	Vector::add(&mut v1, &v2);
-	assert_eq!(v1.data, [5., 7., 9.]);
+	assert_eq!(v1.data, [7., 10.]);
 }
 
 #[test]
-fn test_vector_subtraction() {
-	let mut v1 = Vector::new([1., 2., 3.]);
-	let v2 = Vector::new([4., 5., 6.]);
+fn test_vector_sub() {
+	let mut v1 = Vector::new([2., 3.]);
+	let v2 = Vector::new([5., 7.]);
 	Vector::sub(&mut v1, &v2);
-	assert_eq!(v1.data, [-3., -3., -3.]);
+	assert_eq!(v1.data, [-3., -4.]);
 }
 
 #[test]
-fn test_vector_scalar_multiplication() {
-	let mut v1 = Vector::new([1., 2., 3.]);
+fn test_vector_scl() {
+	let mut v1 = Vector::new([2., 3.]);
 	Vector::scl(&mut v1, 2.);
-	assert_eq!(v1.data, [2., 4., 6.]);
-}
-
-#[test]
-fn test_vector_add_assign() {
-	let mut v1 = Vector::new([1., 2., 3.]);
-	let v2 = Vector::new([4., 5., 6.]);
-	v1 += v2;
-	assert_eq!(v1.data, [5., 7., 9.]);
-}
-
-#[test]
-fn test_vector_to_matrix() {
-	let v = Vector::new([1., 2., 3.]);
-	let m = v.vtom();
-	assert_eq!(m.data, [[1.], [2.], [3.]]);
+	assert_eq!(v1.data, [4., 6.]);
 }
 
 #[test]
 fn test_vector_linear_combination() {
-	let vectors = [
+	let vs1 = [
 		Vector::new([1., 0., 0.]),
 		Vector::new([0., 1., 0.]),
 		Vector::new([0., 0., 1.]),
 	];
-	let coefs = [2., -1., 0.5];
-	let result = Vector::linear_combination(&vectors, &coefs);
-	assert_eq!(result.data, [2., -1., 0.5]);
+	let vs2 = [Vector::new([1., 2., 3.]), Vector::new([0., 10., -100.])];
+	let coefs1 = [10., -2., 0.5];
+	let coefs2 = [10., -2.];
+	let result1 = Vector::linear_combination(&vs1, &coefs1);
+	let result2 = Vector::linear_combination(&vs2, &coefs2);
+	assert_eq!(result1.data, [10., -2., 0.5]);
+	assert_eq!(result2.data, [10., -0., 230.]);
 }
 
 #[test]
 fn test_vector_dot_product() {
-	let v1 = Vector::new([1., 2., 3.]);
-	let v2 = Vector::new([4., 5., 6.]);
-	assert_eq!(v1.dot(v2), 32.);
+	let v1 = Vector::new([0., 0.]);
+	let v2 = Vector::new([1., 1.]);
+	assert_eq!(v1.dot(v2), 0.0);
+
+	let v1: Vector<f32, 2> = Vector::new([1., 1.]);
+	let v2 = Vector::new([1., 1.]);
+	assert_eq!(v1.dot(v2), 2.0);
+
+	let v1 = Vector::new([-1., 6.]);
+	let v2 = Vector::new([3., 2.]);
+	assert_eq!(v1.dot(v2), 9.0);
 }
 
 #[test]
 fn test_vector_norms() {
-	let v = Vector::new([1., -2., 3.]);
-	assert_eq!(v.norm_1(), 6.);
-	assert_approx_eq(v.norm_2(), 14.0_f64.sqrt());
-	assert_eq!(v.norm_inf(), 3.);
+	let u = Vector::new([0., 0., 0.]);
+	assert_eq!(u.norm_1(), 0.0);
+	assert_approx_eq(u.norm_2(), 0.0);
+	assert_eq!(u.norm_inf(), 0.0);
+
+	let u = Vector::new([1., 2., 3.]);
+	assert_eq!(u.norm_1(), 6.0);
+	assert_approx_eq(u.norm_2(), 3.7416575);
+	assert_eq!(u.norm_inf(), 3.0);
+
+	let u = Vector::new([-1., -2.]);
+	assert_eq!(u.norm_1(), 3.0);
+	assert_approx_eq(u.norm_2(), 2.236068);
+	assert_eq!(u.norm_inf(), 2.0);
 }
 
 #[test]
 fn test_vector_angle_cos() {
-	let v1 = Vector::new([1., 0.]);
-	let v2 = Vector::new([1., 1.]);
-	assert_approx_eq(Vector::angle_cos(&v1, &v2), 1. / 2.0_f64.sqrt());
+	let u = Vector::new([1., 0.]);
+	let v = Vector::new([1., 0.]);
+	assert_approx_eq(Vector::angle_cos(&u, &v), 1.0);
+
+	let u = Vector::new([1., 0.]);
+	let v = Vector::new([0., 1.]);
+	assert_approx_eq(Vector::angle_cos(&u, &v), 0.0);
+
+	let u = Vector::new([-1., 1.]);
+	let v = Vector::new([1., -1.]);
+	assert_approx_eq(Vector::angle_cos(&u, &v), -1.0);
+
+	let u = Vector::new([2., 1.]);
+	let v = Vector::new([4., 2.]);
+	assert_approx_eq(Vector::angle_cos(&u, &v), 1.0);
+
+	let u = Vector::new([1., 2., 3.]);
+	let v = Vector::new([4., 5., 6.]);
+	assert_approx_eq(Vector::angle_cos(&u, &v), 0.97463185);
 }
 
 #[test]
 fn test_vector_cross_product() {
-	let i = Vector::new([1., 0., 0.]);
-	let j = Vector::new([0., 1., 0.]);
-	let k = Vector::<f64, 3>::cross_product(&i, &j);
-	assert_eq!(k.data, [0., 0., 1.]);
+	let u = Vector::new([0., 0., 1.]);
+	let v = Vector::new([1., 0., 0.]);
+	let result = Vector::<f32, 3>::cross_product(&u, &v);
+	assert_eq!(result.data, [0., 1., 0.]);
+
+	let u = Vector::new([1., 2., 3.]);
+	let v = Vector::new([4., 5., 6.]);
+	let result = Vector::<f32, 3>::cross_product(&u, &v);
+	assert_eq!(result.data, [-3., 6., -3.]);
+
+	let u = Vector::new([4., 2., -3.]);
+	let v = Vector::new([-2., -5., 16.]);
+	let result = Vector::<f32, 3>::cross_product(&u, &v);
+	assert_eq!(result.data, [17., -58., -16.]);
 }
 
 #[test]
 fn test_vector_lerp() {
-	let v_start = Vector::new([0., 0., 0.]);
-	let v_end = Vector::new([1., 1., 1.]);
-	let v_lerp = lerp(v_start, v_end, 0.5);
-	assert_eq!(v_lerp.data, [0.5, 0.5, 0.5]);
-}
+	assert_approx_eq(lerp(0., 1., 0.), 0.0);
+	assert_approx_eq(lerp(0., 1., 1.), 1.0);
+	assert_approx_eq(lerp(0., 1., 0.5), 0.5);
+	assert_approx_eq(lerp(21., 42., 0.3), 27.3);
 
-#[test]
-fn test_matrix_creation() {
-	let m = Matrix::new([[1., 2.], [3., 4.]]);
-	assert_eq!(m.data, [[1., 2.], [3., 4.]]);
+	let v_start = Vector::new([2., 1.]);
+	let v_end = Vector::new([4., 2.]);
+	let v_lerp = lerp(v_start, v_end, 0.3);
+	assert_approx_eq(v_lerp.data[0], 2.6);
+	assert_approx_eq(v_lerp.data[1], 1.3);
+
+	let m_start = Matrix::new([[2., 1.], [3., 4.]]);
+	let m_end = Matrix::new([[20., 10.], [30., 40.]]);
+	let m_lerp = lerp(m_start, m_end, 0.5);
+	let expected_matrix = Matrix::new([[11., 5.5], [16.5, 22.]]);
+	for i in 0..2 {
+		for j in 0..2 {
+			assert_approx_eq(m_lerp.data[i][j], expected_matrix.data[i][j]);
+		}
+	}
 }
 
 #[test]
@@ -136,25 +174,51 @@ fn test_matrix_scalar_multiplication() {
 }
 
 #[test]
-fn test_matrix_matrix_multiplication() {
-	let m1 = Matrix::new([[1., 2., 3.], [4., 5., 6.]]);
-	let m2 = Matrix::new([[1., 2.], [4., 5.], [7., 8.]]);
-	let result = Matrix::mul_mat(&m1, m2);
-	assert_eq!(result.data, [[30., 36.], [66., 81.]]);
+fn test_matrix_mul_mat() {
+	let u = Matrix::new([[1., 0.], [0., 1.]]);
+	let v = Matrix::new([[1., 0.], [0., 1.]]);
+	let result = u.mul_mat(v);
+	assert_eq!(result.data, [[1., 0.], [0., 1.]]);
+
+	let u = Matrix::new([[1., 0.], [0., 1.]]);
+	let v = Matrix::new([[2., 1.], [4., 2.]]);
+	let result = u.mul_mat(v);
+	assert_eq!(result.data, [[2., 1.], [4., 2.]]);
+
+	let u = Matrix::new([[3., -5.], [6., 8.]]);
+	let v = Matrix::new([[2., 1.], [4., 2.]]);
+	let result = u.mul_mat(v);
+	assert_eq!(result.data, [[-14., -7.], [44., 22.]]);
 }
 
 #[test]
-fn test_matrix_vector_multiplication() {
-	let m = Matrix::new([[1., 2., 3.], [4., 5., 6.]]);
-	let v = Vector::new([1., 2., 3.]);
-	let result = Matrix::mul_vec(&m, v);
-	assert_eq!(result.data, [[14.], [32.]]);
+fn test_matrix_mul_vec() {
+	let u = Matrix::new([[1., 0.], [0., 1.]]);
+	let v = Vector::new([4., 2.]);
+	let result = u.mul_vec(v);
+	assert_eq!(result.data, [[4.], [2.]]);
+
+	let u = Matrix::new([[2., 0.], [0., 2.]]);
+	let v = Vector::new([4., 2.]);
+	let result = u.mul_vec(v);
+	assert_eq!(result.data, [[8.], [4.]]);
+
+	let u = Matrix::new([[2., -2.], [-2., 2.]]);
+	let v = Vector::new([4., 2.]);
+	let result = u.mul_vec(v);
+	assert_eq!(result.data, [[4.], [-4.]]);
 }
 
 #[test]
 fn test_matrix_trace() {
-	let m = Matrix::new([[1., 2., 3.], [4., 5., 6.], [7., 8., 9.]]);
-	assert_eq!(m.trace(), 15.);
+	let u = Matrix::new([[1., 0.], [0., 1.]]);
+	assert_eq!(u.trace(), 2.0);
+
+	let u = Matrix::new([[2., -5., 0.], [4., 3., 7.], [-2., 3., 4.]]);
+	assert_eq!(u.trace(), 9.0);
+
+	let u = Matrix::new([[-2., -8., 4.], [1., -23., 4.], [0., 6., 4.]]);
+	assert_eq!(u.trace(), -21.0);
 }
 
 #[test]
@@ -167,41 +231,113 @@ fn test_matrix_transpose() {
 
 #[test]
 fn test_matrix_row_echelon() {
-	let m = Matrix::new([
+	let u = Matrix::new([[1., 0., 0.], [0., 1., 0.], [0., 0., 1.]]);
+	let echelon = u.row_echelon();
+	let expected = Matrix::new([[1., 0., 0.], [0., 1., 0.], [0., 0., 1.]]);
+	for i in 0..3 {
+		for j in 0..3 {
+			assert_approx_eq(echelon.data[i][j], expected.data[i][j]);
+		}
+	}
+
+	let u = Matrix::new([[1., 2.], [3., 4.]]);
+	let echelon = u.row_echelon();
+	let expected = Matrix::new([[1., 0.], [0., 1.]]);
+	for i in 0..2 {
+		for j in 0..2 {
+			assert_approx_eq(echelon.data[i][j], expected.data[i][j]);
+		}
+	}
+
+	let u = Matrix::new([[1., 2.], [2., 4.]]);
+	let echelon = u.row_echelon();
+	let expected = Matrix::new([[1., 2.], [0., 0.]]);
+	for i in 0..2 {
+		for j in 0..2 {
+			assert_approx_eq(echelon.data[i][j], expected.data[i][j]);
+		}
+	}
+
+	let u = Matrix::new([
 		[8., 5., -2., 4., 28.],
 		[4., 2.5, 20., 4., -4.],
 		[8., 5., 1., 4., 17.],
 	]);
-	let echelon = m.row_echelon();
-	assert_eq!(echelon.data[1][0], 0.);
-	assert_eq!(echelon.data[2][0], 0.);
-	assert_eq!(echelon.data[2][1], 0.);
+	let echelon = u.row_echelon();
+	let expected = Matrix::new([
+		[1., 0.625, 0., 0., -12.166667],
+		[0., 0., 1., 0., -3.6666667],
+		[0., 0., 0., 1., 29.5],
+	]);
+	for i in 0..3 {
+		for j in 0..5 {
+			assert_approx_eq(echelon.data[i][j], expected.data[i][j]);
+		}
+	}
 }
 
 #[test]
 fn test_matrix_determinant() {
-	let m = Matrix::new([[8., 5., -2.], [4., 7., 20.], [7., 6., 1.]]);
-	assert_approx_eq(m.determinant(), -174.);
+	let u = Matrix::new([[1., -1.], [-1., 1.]]);
+	assert_approx_eq(u.determinant(), 0.0);
+
+	let u = Matrix::new([[2., 0., 0.], [0., 2., 0.], [0., 0., 2.]]);
+	assert_approx_eq(u.determinant(), 8.0);
+
+	let u = Matrix::new([[8., 5., -2.], [4., 7., 20.], [7., 6., 1.]]);
+	assert_approx_eq(u.determinant(), -174.0);
+
+	let u = Matrix::new([
+		[8., 5., -2., 4.],
+		[4., 2.5, 20., 4.],
+		[8., 5., 1., 4.],
+		[28., -4., 17., 1.],
+	]);
+	assert_approx_eq(u.determinant(), 1032.0);
 }
 
 #[test]
 fn test_matrix_inverse() {
-	let m = Matrix::new([[8., 5., -2.], [4., 7., 20.], [7., 6., 1.]]);
-	let inv_m = m.inverse();
+	let u = Matrix::new([[1., 0., 0.], [0., 1., 0.], [0., 0., 1.]]);
+	let inv_u = u.inverse();
+	let expected = Matrix::new([[1., 0., 0.], [0., 1., 0.], [0., 0., 1.]]);
+	for i in 0..3 {
+		for j in 0..3 {
+			assert_approx_eq(inv_u.data[i][j], expected.data[i][j]);
+		}
+	}
+
+	let u = Matrix::new([[2., 0., 0.], [0., 2., 0.], [0., 0., 2.]]);
+	let inv_u = u.inverse();
+	let expected = Matrix::new([[0.5, 0., 0.], [0., 0.5, 0.], [0., 0., 0.5]]);
+	for i in 0..3 {
+		for j in 0..3 {
+			assert_approx_eq(inv_u.data[i][j], expected.data[i][j]);
+		}
+	}
+
+	let u = Matrix::new([[8., 5., -2.], [4., 7., 20.], [7., 6., 1.]]);
+	let inv_u = u.inverse();
 	let expected = Matrix::new([
-		[113. / 174., 17. / 174., -114. / 174.],
-		[-136. / 174., -22. / 174., 168. / 174.],
-		[25. / 174., 13. / 174., -36. / 174.],
+		[0.6494253, 0.09770115, -0.6551724],
+		[-0.7816092, -0.12643678, 0.9655172],
+		[0.14367816, 0.07471264, -0.20689655],
 	]);
 	for i in 0..3 {
 		for j in 0..3 {
-			assert_approx_eq(inv_m.data[i][j], expected.data[i][j]);
+			assert_approx_eq(inv_u.data[i][j], expected.data[i][j]);
 		}
 	}
 }
 
 #[test]
 fn test_matrix_rank() {
-	let m = Matrix::new([[8., 5., -2.], [4., 7., 20.], [7., 6., 1.], [21., 18., 7.]]);
-	assert_eq!(m.rank(), 3);
+	let u = Matrix::new([[1., 0., 0.], [0., 1., 0.], [0., 0., 1.]]);
+	assert_eq!(u.rank(), 3);
+
+	let u = Matrix::new([[1., 2., 0., 0.], [2., 4., 0., 0.], [-1., 2., 1., 1.]]);
+	assert_eq!(u.rank(), 2);
+
+	let u = Matrix::new([[8., 5., -2.], [4., 7., 20.], [7., 6., 1.], [21., 18., 7.]]);
+	assert_eq!(u.rank(), 3);
 }

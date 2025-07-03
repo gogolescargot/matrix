@@ -28,10 +28,7 @@ impl<K: Traits, const N: usize> Vector<K, N> {
 		return Self::new(self.data);
 	}
 
-	pub fn get_data(&self) -> &[K; N] {
-		return &self.data;
-	}
-
+	#[allow(dead_code)]
 	pub fn vtom(&self) -> Matrix<K, N, 1> {
 		let mut matrix = [[K::default(); 1]; N];
 
@@ -73,9 +70,9 @@ impl<K: Traits, const N: usize> Vector<K, N> {
 		let mut result = Vector::new([K::default(); N]);
 
 		for i in 0..u.len() {
-			let mut temp = u[i].clone();
-			temp *= coefs[i];
-			result += temp;
+			for j in 0..N {
+				result.data[j] = u[i].data[j].mul_add(coefs[i], result.data[j]);
+			}
 		}
 
 		return result;
@@ -85,14 +82,14 @@ impl<K: Traits, const N: usize> Vector<K, N> {
 		let mut result = K::default();
 
 		for i in 0..self.data.len() {
-			result += self.data[i] * v.data[i];
+			result = self.data[i].mul_add(v.data[i], result);
 		}
 
 		return result;
 	}
 
-	pub fn norm_1(&self) -> f64 {
-		let mut result = f64::default();
+	pub fn norm_1(&self) -> f32 {
+		let mut result = f32::default();
 
 		for i in 0..self.data.len() {
 			result += self.data[i].into().abs()
@@ -101,18 +98,19 @@ impl<K: Traits, const N: usize> Vector<K, N> {
 		return result;
 	}
 
-	pub fn norm_2(&self) -> f64 {
-		let mut result = f64::default();
+	pub fn norm_2(&self) -> f32 {
+		let mut result = f32::default();
 
 		for i in 0..self.data.len() {
-			result += self.data[i].into().powi(2);
+			let val: f32 = self.data[i].into();
+			result = val.mul_add(val, result);
 		}
 
-		return result.sqrt();
+		result.sqrt()
 	}
 
-	pub fn norm_inf(&self) -> f64 {
-		let mut max: f64 = self.data[0].into().abs();
+	pub fn norm_inf(&self) -> f32 {
+		let mut max: f32 = self.data[0].into().abs();
 
 		for i in 1..self.data.len() {
 			if max < self.data[i].into().abs() {
@@ -123,16 +121,16 @@ impl<K: Traits, const N: usize> Vector<K, N> {
 		return max;
 	}
 
-	pub fn angle_cos(u: &Vector<K, N>, v: &Vector<K, N>) -> f64 {
+	pub fn angle_cos(u: &Vector<K, N>, v: &Vector<K, N>) -> f32 {
 		return (u.dot(v.clone())).into() / (u.norm_2() * v.norm_2());
 	}
 
 	pub fn cross_product(u: &Vector<K, 3>, v: &Vector<K, 3>) -> Vector<K, 3> {
-		return Vector::new([
-			(u.data[1] * v.data[2]) - (u.data[2] * v.data[1]),
-			(u.data[2] * v.data[0]) - (u.data[0] * v.data[2]),
-			(u.data[0] * v.data[1]) - (u.data[1] * v.data[0]),
-		]);
+		Vector::new([
+			u.data[1].mul_add(v.data[2], -(u.data[2] * v.data[1])),
+			u.data[2].mul_add(v.data[0], -(u.data[0] * v.data[2])),
+			u.data[0].mul_add(v.data[1], -(u.data[1] * v.data[0])),
+		])
 	}
 }
 
@@ -200,11 +198,4 @@ impl<K: Traits, const N: usize> MulAssign<K> for Vector<K, N> {
 			self.data[i] *= a;
 		}
 	}
-}
-
-pub fn lerp<V>(u: V, v: V, t: f64) -> V
-where
-	V: Mul<f64, Output = V> + Add<Output = V>,
-{
-	u * (1. - t) + v * t
 }
