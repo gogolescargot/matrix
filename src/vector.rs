@@ -1,26 +1,14 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   vector.rs                                          :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: ggalon <ggalon@student.42lyon.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/12/24 13:13:02 by ggalon            #+#    #+#             */
-/*   Updated: 2024/12/31 13:22:18 by ggalon           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 use std::ops::{Add, AddAssign, Mul, MulAssign, Sub, SubAssign};
 
 use crate::matrix::Matrix;
-use crate::traits::Traits;
+use crate::scalar::Scalar;
 
 pub struct Vector<K, const N: usize> {
 	pub data: [K; N],
 	pub size: usize,
 }
 
-impl<K: Traits, const N: usize> Vector<K, N> {
+impl<K: Scalar, const N: usize> Vector<K, N> {
 	pub fn new(data: [K; N]) -> Self {
 		let size = N;
 		Self { data, size }
@@ -94,7 +82,7 @@ impl<K: Traits, const N: usize> Vector<K, N> {
 		let mut result = f32::default();
 
 		for i in 0..N {
-			result += self.data[i].into().abs()
+			result += self.data[i].to_f32().unwrap().abs()
 		}
 
 		return result;
@@ -104,7 +92,7 @@ impl<K: Traits, const N: usize> Vector<K, N> {
 		let mut result = f32::default();
 
 		for i in 0..N {
-			let val: f32 = self.data[i].into();
+			let val: f32 = self.data[i].to_f32().unwrap();
 			result = val.mul_add(val, result);
 		}
 
@@ -115,11 +103,11 @@ impl<K: Traits, const N: usize> Vector<K, N> {
 		if N == 0 {
 			return f32::NAN;
 		}
-		let mut max: f32 = self.data[0].into().abs();
+		let mut max: f32 = self.data[0].to_f32().unwrap().abs();
 
 		for i in 1..N {
-			if max < self.data[i].into().abs() {
-				max = self.data[i].into().abs();
+			if max < self.data[i].to_f32().unwrap().abs() {
+				max = self.data[i].to_f32().unwrap().abs();
 			}
 		}
 
@@ -134,7 +122,7 @@ impl<K: Traits, const N: usize> Vector<K, N> {
 		if norm_product == 0. {
 			return f32::NAN;
 		}
-		return (u.dot(v.clone())).into() / norm_product;
+		return (u.dot(v.clone())).to_f32().unwrap() / norm_product;
 	}
 
 	pub fn cross_product(u: &Vector<K, 3>, v: &Vector<K, 3>) -> Vector<K, 3> {
@@ -146,7 +134,7 @@ impl<K: Traits, const N: usize> Vector<K, N> {
 	}
 }
 
-impl<K: Traits, const N: usize> Add for Vector<K, N> {
+impl<K: Scalar, const N: usize> Add for Vector<K, N> {
 	type Output = Self;
 
 	fn add(self, v: Self) -> Self::Output {
@@ -160,7 +148,7 @@ impl<K: Traits, const N: usize> Add for Vector<K, N> {
 	}
 }
 
-impl<K: Traits, const N: usize> AddAssign for Vector<K, N> {
+impl<K: Scalar, const N: usize> AddAssign for Vector<K, N> {
 	fn add_assign(&mut self, v: Self) {
 		for i in 0..N {
 			self.data[i] += v.data[i];
@@ -168,7 +156,7 @@ impl<K: Traits, const N: usize> AddAssign for Vector<K, N> {
 	}
 }
 
-impl<K: Traits, const N: usize> Sub for Vector<K, N> {
+impl<K: Scalar, const N: usize> Sub for Vector<K, N> {
 	type Output = Self;
 
 	fn sub(self, v: Self) -> Self::Output {
@@ -182,7 +170,7 @@ impl<K: Traits, const N: usize> Sub for Vector<K, N> {
 	}
 }
 
-impl<K: Traits, const N: usize> SubAssign for Vector<K, N> {
+impl<K: Scalar, const N: usize> SubAssign for Vector<K, N> {
 	fn sub_assign(&mut self, v: Self) {
 		for i in 0..N {
 			self.data[i] -= v.data[i];
@@ -190,7 +178,7 @@ impl<K: Traits, const N: usize> SubAssign for Vector<K, N> {
 	}
 }
 
-impl<K: Traits, const N: usize> Mul<K> for Vector<K, N> {
+impl<K: Scalar, const N: usize> Mul<K> for Vector<K, N> {
 	type Output = Self;
 
 	fn mul(self, a: K) -> Self::Output {
@@ -204,7 +192,7 @@ impl<K: Traits, const N: usize> Mul<K> for Vector<K, N> {
 	}
 }
 
-impl<K: Traits, const N: usize> MulAssign<K> for Vector<K, N> {
+impl<K: Scalar, const N: usize> MulAssign<K> for Vector<K, N> {
 	fn mul_assign(&mut self, a: K) {
 		for i in 0..N {
 			self.data[i] *= a;

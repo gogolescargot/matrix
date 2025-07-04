@@ -1,18 +1,6 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   matrix.rs                                          :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: ggalon <ggalon@student.42lyon.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/12/24 14:20:04 by ggalon            #+#    #+#             */
-/*   Updated: 2025/01/03 18:26:39 by ggalon           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 use std::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
-use crate::traits::Traits;
+use crate::scalar::Scalar;
 use crate::vector::Vector;
 
 #[allow(dead_code)]
@@ -23,7 +11,7 @@ pub struct Matrix<K, const M: usize, const N: usize> {
 	pub is_square: bool,
 }
 
-impl<K: Traits, const M: usize, const N: usize> Matrix<K, M, N> {
+impl<K: Scalar, const M: usize, const N: usize> Matrix<K, M, N> {
 	pub fn new(data: [[K; N]; M]) -> Self {
 		let size_y = M;
 		let size_x = N;
@@ -86,12 +74,12 @@ impl<K: Traits, const M: usize, const N: usize> Matrix<K, M, N> {
 		return result;
 	}
 
-	pub fn mul_vec(&self, vec: Vector<K, N>) -> Matrix<K, M, 1> {
-		let mut result: Matrix<K, M, 1> = Matrix::new([[K::default(); 1]; M]);
+	pub fn mul_vec(&self, vec: Vector<K, N>) -> Vector<K, M> {
+		let mut result: Vector<K, M> = Vector::new([K::default(); M]);
 
 		for i in 0..M {
 			for k in 0..N {
-				result.data[i][0] = self.data[i][k].mul_add(vec.data[k], result.data[i][0]);
+				result.data[i] = self.data[i][k].mul_add(vec.data[k], result.data[i]);
 			}
 		}
 		return result;
@@ -123,7 +111,9 @@ impl<K: Traits, const M: usize, const N: usize> Matrix<K, M, N> {
 
 			let mut max_row = pivot_row;
 			for i in pivot_row + 1..M {
-				if result.data[i][col].into().abs() > result.data[max_row][col].into().abs() {
+				if result.data[i][col].to_f32().unwrap().abs()
+					> result.data[max_row][col].to_f32().unwrap().abs()
+				{
 					max_row = i;
 				}
 			}
@@ -183,7 +173,7 @@ impl<K: Traits, const M: usize, const N: usize> Matrix<K, M, N> {
 	}
 }
 
-impl<K: Traits + Neg<Output = K>, const N: usize> Matrix<K, N, N> {
+impl<K: Scalar + Neg<Output = K>, const N: usize> Matrix<K, N, N> {
 	pub fn trace(&self) -> K {
 		let mut result = K::default();
 
@@ -196,7 +186,7 @@ impl<K: Traits + Neg<Output = K>, const N: usize> Matrix<K, N, N> {
 
 	pub fn determinant(&self) -> K {
 		if N == 0 {
-			return K::from(1.);
+			return K::one();
 		} else if N == 1 {
 			return self.data[0][0];
 		} else if N == 2 {
@@ -246,7 +236,7 @@ impl<K: Traits + Neg<Output = K>, const N: usize> Matrix<K, N, N> {
 		let mut idtt: Matrix<K, N, N> = Matrix::new([[K::default(); N]; N]);
 
 		for i in 0..N {
-			idtt.data[i][i] = K::from(1.);
+			idtt.data[i][i] = K::one();
 		}
 
 		let mut pivot_row = 0;
@@ -261,7 +251,9 @@ impl<K: Traits + Neg<Output = K>, const N: usize> Matrix<K, N, N> {
 			let mut max_row: usize = pivot_row;
 
 			for i in pivot_row + 1..N {
-				if base.data[i][col].into().abs() > base.data[max_row][col].into().abs() {
+				if base.data[i][col].to_f32().unwrap().abs()
+					> base.data[max_row][col].to_f32().unwrap().abs()
+				{
 					max_row = i;
 				}
 			}
@@ -306,7 +298,7 @@ impl<K: Traits + Neg<Output = K>, const N: usize> Matrix<K, N, N> {
 	}
 }
 
-impl<K: Traits, const M: usize, const N: usize> Add for Matrix<K, M, N> {
+impl<K: Scalar, const M: usize, const N: usize> Add for Matrix<K, M, N> {
 	type Output = Self;
 
 	fn add(self, v: Self) -> Self::Output {
@@ -322,7 +314,7 @@ impl<K: Traits, const M: usize, const N: usize> Add for Matrix<K, M, N> {
 	}
 }
 
-impl<K: Traits, const M: usize, const N: usize> AddAssign for Matrix<K, M, N> {
+impl<K: Scalar, const M: usize, const N: usize> AddAssign for Matrix<K, M, N> {
 	fn add_assign(&mut self, v: Self) {
 		for i in 0..M {
 			for j in 0..N {
@@ -332,7 +324,7 @@ impl<K: Traits, const M: usize, const N: usize> AddAssign for Matrix<K, M, N> {
 	}
 }
 
-impl<K: Traits, const M: usize, const N: usize> Sub for Matrix<K, M, N> {
+impl<K: Scalar, const M: usize, const N: usize> Sub for Matrix<K, M, N> {
 	type Output = Self;
 
 	fn sub(self, v: Self) -> Self::Output {
@@ -348,7 +340,7 @@ impl<K: Traits, const M: usize, const N: usize> Sub for Matrix<K, M, N> {
 	}
 }
 
-impl<K: Traits, const M: usize, const N: usize> SubAssign for Matrix<K, M, N> {
+impl<K: Scalar, const M: usize, const N: usize> SubAssign for Matrix<K, M, N> {
 	fn sub_assign(&mut self, v: Self) {
 		for i in 0..M {
 			for j in 0..N {
@@ -358,7 +350,7 @@ impl<K: Traits, const M: usize, const N: usize> SubAssign for Matrix<K, M, N> {
 	}
 }
 
-impl<K: Traits, const M: usize, const N: usize> Mul<K> for Matrix<K, M, N> {
+impl<K: Scalar, const M: usize, const N: usize> Mul<K> for Matrix<K, M, N> {
 	type Output = Self;
 
 	fn mul(self, a: K) -> Self::Output {
@@ -374,7 +366,7 @@ impl<K: Traits, const M: usize, const N: usize> Mul<K> for Matrix<K, M, N> {
 	}
 }
 
-impl<K: Traits, const M: usize, const N: usize> MulAssign<K> for Matrix<K, M, N> {
+impl<K: Scalar, const M: usize, const N: usize> MulAssign<K> for Matrix<K, M, N> {
 	fn mul_assign(&mut self, a: K) {
 		for i in 0..M {
 			for j in 0..N {
@@ -384,7 +376,7 @@ impl<K: Traits, const M: usize, const N: usize> MulAssign<K> for Matrix<K, M, N>
 	}
 }
 
-impl<K: Traits, const M: usize, const N: usize, const P: usize> Mul<Matrix<K, N, P>>
+impl<K: Scalar, const M: usize, const N: usize, const P: usize> Mul<Matrix<K, N, P>>
 	for Matrix<K, M, N>
 {
 	type Output = Matrix<K, M, P>;
@@ -403,7 +395,7 @@ impl<K: Traits, const M: usize, const N: usize, const P: usize> Mul<Matrix<K, N,
 	}
 }
 
-impl<K: Traits, const M: usize, const N: usize> Mul<Vector<K, N>> for Matrix<K, M, N> {
+impl<K: Scalar, const M: usize, const N: usize> Mul<Vector<K, N>> for Matrix<K, M, N> {
 	type Output = Matrix<K, M, 1>;
 
 	fn mul(self, v: Vector<K, N>) -> Matrix<K, M, 1> {
