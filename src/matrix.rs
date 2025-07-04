@@ -144,7 +144,7 @@ impl<K: Traits, const M: usize, const N: usize> Matrix<K, M, N> {
 				result.data[pivot_row][j] /= pivot;
 			}
 
-			// Cancel the elements below
+			// Cancel the elements
 
 			for i in 0..M {
 				if i == pivot_row {
