@@ -18,7 +18,6 @@ impl<K: Scalar, const N: usize> Vector<K, N> {
 		return Self::new(self.data);
 	}
 
-	#[allow(dead_code)]
 	pub fn vtom(&self) -> Matrix<K, N, 1> {
 		let mut matrix = [[K::default(); 1]; N];
 
@@ -29,7 +28,6 @@ impl<K: Scalar, const N: usize> Vector<K, N> {
 		return Matrix::new(matrix);
 	}
 
-	#[allow(dead_code)]
 	pub fn print(&self) {
 		println!("{:?}", &self.data);
 	}

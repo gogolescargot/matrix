@@ -3,7 +3,6 @@ use std::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 use crate::scalar::Scalar;
 use crate::vector::Vector;
 
-#[allow(dead_code)]
 pub struct Matrix<K, const M: usize, const N: usize> {
 	pub data: [[K; N]; M],
 	pub size_x: usize,
@@ -29,7 +28,6 @@ impl<K: Scalar, const M: usize, const N: usize> Matrix<K, M, N> {
 		return Self::new(self.data);
 	}
 
-	#[allow(dead_code)]
 	pub fn print(&self) {
 		for row in &self.data {
 			println!("{:?}", row);

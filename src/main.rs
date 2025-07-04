@@ -1,6 +1,10 @@
+#![allow(dead_code)]
+
+#[cfg(test)]
+mod test;
+
 mod matrix;
 mod scalar;
-mod test;
 mod vector;
 
 use std::ops::{Add, Mul};
@@ -13,7 +17,7 @@ where
 		panic!("Scalar need to be between 0 and 1")
 	}
 
-	u * (1. - t) + v * t
+	return u * (1. - t) + v * t;
 }
 
 fn main() {}

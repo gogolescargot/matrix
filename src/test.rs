@@ -51,7 +51,6 @@ fn cmp_vector_approx<const N: usize>(v1: &Vector<f32, N>, v2: &Vector<f32, N>) {
 	}
 }
 
-#[cfg(test)]
 #[test]
 fn test_vector_add() {
 	let mut u = Vector::new([2., 3.]);
@@ -342,7 +341,7 @@ fn test_vector_cross_product() {
 
 #[test]
 fn test_vector_lerp() {
-	assert_approx_eq!(lerp(0., 1., 0.), 0.0);
+	assert_approx_eq!(lerp(0., 1., 0.), 0.);
 	assert_approx_eq!(lerp(0., 1., 1.), 1.0);
 	assert_approx_eq!(lerp(0., 42., 0.5), 21.0);
 	assert_approx_eq!(lerp(-42., 42., 0.5), 0.0);
