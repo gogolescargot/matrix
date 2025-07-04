@@ -17,11 +17,13 @@ use crate::traits::Traits;
 
 pub struct Vector<K, const N: usize> {
 	pub data: [K; N],
+	pub size: usize,
 }
 
 impl<K: Traits, const N: usize> Vector<K, N> {
 	pub fn new(data: [K; N]) -> Self {
-		Self { data }
+		let size = N;
+		Self { data, size }
 	}
 
 	pub fn clone(&self) -> Self {
@@ -81,7 +83,7 @@ impl<K: Traits, const N: usize> Vector<K, N> {
 	pub fn dot(&self, v: Vector<K, N>) -> K {
 		let mut result = K::default();
 
-		for i in 0..self.data.len() {
+		for i in 0..N {
 			result = self.data[i].mul_add(v.data[i], result);
 		}
 
@@ -91,7 +93,7 @@ impl<K: Traits, const N: usize> Vector<K, N> {
 	pub fn norm_1(&self) -> f32 {
 		let mut result = f32::default();
 
-		for i in 0..self.data.len() {
+		for i in 0..N {
 			result += self.data[i].into().abs()
 		}
 
@@ -101,7 +103,7 @@ impl<K: Traits, const N: usize> Vector<K, N> {
 	pub fn norm_2(&self) -> f32 {
 		let mut result = f32::default();
 
-		for i in 0..self.data.len() {
+		for i in 0..N {
 			let val: f32 = self.data[i].into();
 			result = val.mul_add(val, result);
 		}
@@ -110,9 +112,12 @@ impl<K: Traits, const N: usize> Vector<K, N> {
 	}
 
 	pub fn norm_inf(&self) -> f32 {
+		if N == 0 {
+			return f32::NAN;
+		}
 		let mut max: f32 = self.data[0].into().abs();
 
-		for i in 1..self.data.len() {
+		for i in 1..N {
 			if max < self.data[i].into().abs() {
 				max = self.data[i].into().abs();
 			}
@@ -122,7 +127,14 @@ impl<K: Traits, const N: usize> Vector<K, N> {
 	}
 
 	pub fn angle_cos(u: &Vector<K, N>, v: &Vector<K, N>) -> f32 {
-		return (u.dot(v.clone())).into() / (u.norm_2() * v.norm_2());
+		if N == 0 {
+			return f32::NAN;
+		}
+		let norm_product = u.norm_2() * v.norm_2();
+		if norm_product == 0. {
+			return f32::NAN;
+		}
+		return (u.dot(v.clone())).into() / norm_product;
 	}
 
 	pub fn cross_product(u: &Vector<K, 3>, v: &Vector<K, 3>) -> Vector<K, 3> {

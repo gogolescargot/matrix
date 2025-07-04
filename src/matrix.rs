@@ -10,19 +10,31 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-use std::cmp::min;
 use std::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 use crate::traits::Traits;
 use crate::vector::Vector;
 
+#[allow(dead_code)]
 pub struct Matrix<K, const M: usize, const N: usize> {
 	pub data: [[K; N]; M],
+	pub size_x: usize,
+	pub size_y: usize,
+	pub is_square: bool,
 }
 
 impl<K: Traits, const M: usize, const N: usize> Matrix<K, M, N> {
 	pub fn new(data: [[K; N]; M]) -> Self {
-		Self { data }
+		let size_y = M;
+		let size_x = N;
+		let is_square = size_x == size_y;
+
+		Self {
+			data,
+			size_x,
+			size_y,
+			is_square,
+		}
 	}
 
 	pub fn clone(&self) -> Self {
@@ -85,16 +97,6 @@ impl<K: Traits, const M: usize, const N: usize> Matrix<K, M, N> {
 		return result;
 	}
 
-	pub fn trace(&self) -> K {
-		let mut result = K::default();
-
-		for i in 0..min(M, N) {
-			result += self.data[i][i];
-		}
-
-		return result;
-	}
-
 	pub fn transpose(&self) -> Matrix<K, N, M> {
 		let mut result: Matrix<K, N, M> = Matrix::new([[K::default(); M]; N]);
 
@@ -119,30 +121,27 @@ impl<K: Traits, const M: usize, const N: usize> Matrix<K, M, N> {
 
 			// Get the max row and swap
 
-			let mut max_row: usize = pivot_row;
-
+			let mut max_row = pivot_row;
 			for i in pivot_row + 1..M {
 				if result.data[i][col].into().abs() > result.data[max_row][col].into().abs() {
 					max_row = i;
 				}
 			}
 
-			if result.data[pivot_row][col] == K::default() {
-				continue;
-			}
-
 			if max_row != pivot_row {
 				result.data.swap(pivot_row, max_row);
 			}
 
+			if result.data[pivot_row][col] == K::default() {
+				continue;
+			}
+
 			// Normalize the pivot row
 
-			if result.data[pivot_row][col] != K::default() {
-				let pivot = result.data[pivot_row][col];
+			let pivot = result.data[pivot_row][col];
 
-				for j in col..N {
-					result.data[pivot_row][j] /= pivot;
-				}
+			for j in col..N {
+				result.data[pivot_row][j] /= pivot;
 			}
 
 			// Cancel the elements below
@@ -185,6 +184,16 @@ impl<K: Traits, const M: usize, const N: usize> Matrix<K, M, N> {
 }
 
 impl<K: Traits + Neg<Output = K>, const N: usize> Matrix<K, N, N> {
+	pub fn trace(&self) -> K {
+		let mut result = K::default();
+
+		for i in 0..N {
+			result += self.data[i][i];
+		}
+
+		return result;
+	}
+
 	pub fn determinant(&self) -> K {
 		if N == 0 {
 			return K::from(1.);
@@ -257,24 +266,22 @@ impl<K: Traits + Neg<Output = K>, const N: usize> Matrix<K, N, N> {
 				}
 			}
 
-			if base.data[pivot_row][col] == K::default() {
-				panic!("Matrix is singular, can't compute inverse");
-			}
-
 			if max_row != pivot_row {
 				base.data.swap(pivot_row, max_row);
 				idtt.data.swap(pivot_row, max_row);
 			}
 
+			if base.data[pivot_row][col] == K::default() {
+				panic!("Matrix is singular, can't compute inverse");
+			}
+
 			// Normalize the pivot row
 
-			if base.data[pivot_row][col] != K::default() {
-				let pivot = base.data[pivot_row][col];
+			let pivot = base.data[pivot_row][col];
 
-				for j in 0..N {
-					base.data[pivot_row][j] /= pivot;
-					idtt.data[pivot_row][j] /= pivot;
-				}
+			for j in 0..N {
+				base.data[pivot_row][j] /= pivot;
+				idtt.data[pivot_row][j] /= pivot;
 			}
 
 			// Cancel the elements
