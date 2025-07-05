@@ -10,6 +10,12 @@ pub struct Matrix<K, const M: usize, const N: usize> {
 	pub is_square: bool,
 }
 
+impl<K: Scalar, const M: usize, const N: usize> From<[[K; N]; M]> for Matrix<K, M, N> {
+	fn from(data: [[K; N]; M]) -> Self {
+		Self::new(data)
+	}
+}
+
 impl<K: Scalar, const M: usize, const N: usize> Matrix<K, M, N> {
 	pub fn new(data: [[K; N]; M]) -> Self {
 		let size_y = M;

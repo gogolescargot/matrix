@@ -53,15 +53,15 @@ fn cmp_vector_approx<const N: usize>(v1: &Vector<f32, N>, v2: &Vector<f32, N>) {
 
 #[test]
 fn test_vector_add() {
-	let mut u = Vector::new([2., 3.]);
-	let v = Vector::new([5., 7.]);
+	let mut u = Vector::from([2., 3.]);
+	let v = Vector::from([5., 7.]);
 	Vector::add(&mut u, &v);
-	cmp_vector(&u, &Vector::new([7., 10.]));
+	cmp_vector(&u, &Vector::from([7., 10.]));
 
-	let mut u = Vector::new([0, 0]);
-	let v = Vector::new([0, 0]);
+	let mut u = Vector::from([0, 0]);
+	let v = Vector::from([0, 0]);
 	Vector::add(&mut u, &v);
-	cmp_vector(&u, &Vector::new([0, 0]));
+	cmp_vector(&u, &Vector::from([0, 0]));
 
 	let mut u = Vector::new([1, 0]);
 	let v = Vector::new([0, 1]);
@@ -365,15 +365,15 @@ fn test_vector_lerp() {
 
 #[test]
 fn test_matrix_addition() {
-	let mut m1 = Matrix::new([[1., 2.], [3., 4.]]);
-	let m2 = Matrix::new([[5., 6.], [7., 8.]]);
+	let mut m1 = Matrix::from([[1., 2.], [3., 4.]]);
+	let m2 = Matrix::from([[5., 6.], [7., 8.]]);
 	Matrix::add(&mut m1, &m2);
-	cmp_matrix(&m1, &Matrix::new([[6., 8.], [10., 12.]]));
+	cmp_matrix(&m1, &Matrix::from([[6., 8.], [10., 12.]]));
 
-	let mut m1 = Matrix::new([[0, 0], [0, 0]]);
-	let m2 = Matrix::new([[0, 0], [0, 0]]);
+	let mut m1 = Matrix::from([[0, 0], [0, 0]]);
+	let m2 = Matrix::from([[0, 0], [0, 0]]);
 	Matrix::add(&mut m1, &m2);
-	cmp_matrix(&m1, &Matrix::new([[0, 0], [0, 0]]));
+	cmp_matrix(&m1, &Matrix::from([[0, 0], [0, 0]]));
 
 	let mut m1 = Matrix::new([[1, 0], [0, 1]]);
 	let m2 = Matrix::new([[0, 0], [0, 0]]);

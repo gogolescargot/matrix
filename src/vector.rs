@@ -8,6 +8,12 @@ pub struct Vector<K, const N: usize> {
 	pub size: usize,
 }
 
+impl<K: Scalar, const N: usize> From<[K; N]> for Vector<K, N> {
+	fn from(data: [K; N]) -> Self {
+		Self::new(data)
+	}
+}
+
 impl<K: Scalar, const N: usize> Vector<K, N> {
 	pub fn new(data: [K; N]) -> Self {
 		let size = N;
