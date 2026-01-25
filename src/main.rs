@@ -3,17 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   main.rs                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ggalon <ggalon@student.42lyon.fr>          +#+  +:+       +#+        */
+/*   By: ggalon <ggalon@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/24 13:13:04 by ggalon            #+#    #+#             */
-/*   Updated: 2025/01/03 18:27:50 by ggalon           ###   ########.fr       */
+/*   Updated: 2026/01/25 15:47:01 by ggalon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 mod matrix;
-mod test;
 mod traits;
 mod vector;
+
+#[cfg(test)]
+mod test;
 
 use std::ops::{Add, Mul};
 
