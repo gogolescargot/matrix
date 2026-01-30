@@ -1,7 +1,7 @@
 use std::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 use crate::field::Field;
-use crate::utils::to_f32_or_exit;
+use crate::utils::{absolute, to_f32_or_exit};
 use crate::vector::Vector;
 
 pub struct Matrix<K, const M: usize, const N: usize> {
@@ -118,7 +118,7 @@ impl<K: Field, const M: usize, const N: usize> Matrix<K, M, N> {
 			for i in pivot_row + 1..M {
 				let a = to_f32_or_exit(result.data[i][col], "matrix::row_echelon");
 				let b = to_f32_or_exit(result.data[max_row][col], "matrix::row_echelon");
-				if a.abs() > b.abs() {
+				if absolute(a) > absolute(b) {
 					max_row = i;
 				}
 			}
@@ -258,7 +258,7 @@ impl<K: Field + Neg<Output = K>, const N: usize> Matrix<K, N, N> {
 			for i in pivot_row + 1..N {
 				let a = to_f32_or_exit(base.data[i][col], "matrix::inverse");
 				let b = to_f32_or_exit(base.data[max_row][col], "matrix::inverse");
-				if a.abs() > b.abs() {
+				if absolute(a) > absolute(b) {
 					max_row = i;
 				}
 			}

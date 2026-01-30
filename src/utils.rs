@@ -26,3 +26,10 @@ pub fn sqrt_newton(x: f32) -> f32 {
 	}
 	return y;
 }
+
+pub fn absolute(x: f32) -> f32 {
+	if x < 0. {
+		return -x;
+	}
+	return x;
+}

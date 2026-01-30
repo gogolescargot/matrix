@@ -2,7 +2,7 @@ use std::ops::{Add, AddAssign, Mul, MulAssign, Sub, SubAssign};
 
 use crate::field::Field;
 use crate::matrix::Matrix;
-use crate::utils::{sqrt_newton, to_f32_or_exit};
+use crate::utils::{absolute, sqrt_newton, to_f32_or_exit};
 
 pub struct Vector<K, const N: usize> {
 	pub data: [K; N],
@@ -88,7 +88,7 @@ impl<K: Field, const N: usize> Vector<K, N> {
 
 		for i in 0..N {
 			let val = to_f32_or_exit(self.data[i], "vector::norm_1");
-			result += val.abs()
+			result += absolute(val);
 		}
 
 		return result;
@@ -109,10 +109,10 @@ impl<K: Field, const N: usize> Vector<K, N> {
 		if N == 0 {
 			return f32::NAN;
 		}
-		let mut max: f32 = to_f32_or_exit(self.data[0], "vector::norm_inf").abs();
+		let mut max: f32 = absolute(to_f32_or_exit(self.data[0], "vector::norm_inf"));
 
 		for i in 1..N {
-			let cur = to_f32_or_exit(self.data[i], "vector::norm_inf").abs();
+			let cur = absolute(to_f32_or_exit(self.data[i], "vector::norm_inf"));
 			if max < cur {
 				max = cur;
 			}
