@@ -1,5 +1,6 @@
 use crate::field::Field;
 use std::fmt::Debug;
+use std::ops::{Add, Mul};
 use std::process;
 
 pub fn to_f32_or_exit<K: Field + Debug>(val: K, ctx: &str) -> f32 {
@@ -32,4 +33,16 @@ pub fn absolute(x: f32) -> f32 {
 		return -x;
 	}
 	return x;
+}
+
+pub fn lerp<V>(u: V, v: V, t: f32) -> V
+where
+	V: Mul<f32, Output = V> + Add<Output = V>,
+{
+	if t < 0. || t > 1. {
+		eprintln!("Field need to be between 0 and 1");
+		process::exit(1);
+	}
+
+	return u * (1. - t) + v * t;
 }

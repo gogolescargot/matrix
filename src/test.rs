@@ -1,5 +1,5 @@
 use crate::matrix::Matrix;
-use crate::vector::lerp;
+use crate::utils::lerp;
 use crate::vector::Vector;
 
 macro_rules! assert_approx_eq {
