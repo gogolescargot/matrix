@@ -1,4 +1,5 @@
 use std::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
+use std::process;
 
 use crate::field::Field;
 use crate::utils::{absolute, to_f32_or_exit};
@@ -231,7 +232,8 @@ impl<K: Field + Neg<Output = K>, const N: usize> Matrix<K, N, N> {
 
 			return result;
 		} else {
-			panic!("Error: Matrix max size is 4x4");
+			eprintln!("Error: Matrix max size is 4x4");
+			process::exit(1);
 		}
 	}
 
@@ -269,7 +271,8 @@ impl<K: Field + Neg<Output = K>, const N: usize> Matrix<K, N, N> {
 			}
 
 			if base.data[pivot_row][col] == K::default() {
-				panic!("Matrix is singular, can't compute inverse");
+				eprintln!("Matrix is singular, can't compute inverse");
+				process::exit(1);
 			}
 
 			// Normalize the pivot row

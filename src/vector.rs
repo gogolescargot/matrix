@@ -1,4 +1,5 @@
 use std::ops::{Add, AddAssign, Mul, MulAssign, Sub, SubAssign};
+use std::process;
 
 use crate::field::Field;
 use crate::matrix::Matrix;
@@ -7,6 +8,18 @@ use crate::utils::{absolute, sqrt_newton, to_f32_or_exit};
 pub struct Vector<K, const N: usize> {
 	pub data: [K; N],
 	pub size: usize,
+}
+
+pub fn lerp<V>(u: V, v: V, t: f32) -> V
+where
+	V: Mul<f32, Output = V> + Add<Output = V>,
+{
+	if t < 0. || t > 1. {
+		eprintln!("Field need to be between 0 and 1");
+		process::exit(1);
+	}
+
+	return u * (1. - t) + v * t;
 }
 
 impl<K: Field, const N: usize> From<[K; N]> for Vector<K, N> {
@@ -59,7 +72,8 @@ impl<K: Field, const N: usize> Vector<K, N> {
 
 	pub fn linear_combination(u: &[Vector<K, N>], coefs: &[K]) -> Vector<K, N> {
 		if u.len() != coefs.len() {
-			panic!("Error: Arrays sizes are different");
+			eprintln!("Error: Arrays sizes are different");
+			process::exit(1);
 		}
 
 		let mut result = Vector::new([K::default(); N]);

@@ -1,5 +1,5 @@
-use crate::lerp;
 use crate::matrix::Matrix;
+use crate::vector::lerp;
 use crate::vector::Vector;
 
 macro_rules! assert_approx_eq {
@@ -664,7 +664,7 @@ fn test_matrix_inverse() {
 
 	// let m = Matrix::new([[1., 1.], [1., 1.]]);
 	// m.inverse();
-	// Should Panic
+	// Should exit
 
 	let m = Matrix::new([[8., 5., -2.], [4., 7., 20.], [7., 6., 1.]]);
 	let inv = m.inverse();
