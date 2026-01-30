@@ -1,20 +1,21 @@
 use std::ops::{Add, AddAssign, Mul, MulAssign, Sub, SubAssign};
 
+use crate::field::Field;
 use crate::matrix::Matrix;
-use crate::scalar::Scalar;
+use crate::utils::{sqrt_newton, to_f32_or_exit};
 
 pub struct Vector<K, const N: usize> {
 	pub data: [K; N],
 	pub size: usize,
 }
 
-impl<K: Scalar, const N: usize> From<[K; N]> for Vector<K, N> {
+impl<K: Field, const N: usize> From<[K; N]> for Vector<K, N> {
 	fn from(data: [K; N]) -> Self {
 		Self::new(data)
 	}
 }
 
-impl<K: Scalar, const N: usize> Vector<K, N> {
+impl<K: Field, const N: usize> Vector<K, N> {
 	pub fn new(data: [K; N]) -> Self {
 		let size = N;
 		Self { data, size }
@@ -86,7 +87,8 @@ impl<K: Scalar, const N: usize> Vector<K, N> {
 		let mut result = f32::default();
 
 		for i in 0..N {
-			result += self.data[i].to_f32().unwrap().abs()
+			let val = to_f32_or_exit(self.data[i], "vector::norm_1");
+			result += val.abs()
 		}
 
 		return result;
@@ -96,22 +98,23 @@ impl<K: Scalar, const N: usize> Vector<K, N> {
 		let mut result = f32::default();
 
 		for i in 0..N {
-			let val: f32 = self.data[i].to_f32().unwrap();
+			let val: f32 = to_f32_or_exit(self.data[i], "vector::norm_2");
 			result = val.mul_add(val, result);
 		}
 
-		result.sqrt()
+		return sqrt_newton(result);
 	}
 
 	pub fn norm_inf(&self) -> f32 {
 		if N == 0 {
 			return f32::NAN;
 		}
-		let mut max: f32 = self.data[0].to_f32().unwrap().abs();
+		let mut max: f32 = to_f32_or_exit(self.data[0], "vector::norm_inf").abs();
 
 		for i in 1..N {
-			if max < self.data[i].to_f32().unwrap().abs() {
-				max = self.data[i].to_f32().unwrap().abs();
+			let cur = to_f32_or_exit(self.data[i], "vector::norm_inf").abs();
+			if max < cur {
+				max = cur;
 			}
 		}
 
@@ -126,7 +129,8 @@ impl<K: Scalar, const N: usize> Vector<K, N> {
 		if norm_product == 0. {
 			return f32::NAN;
 		}
-		return (u.dot(v.clone())).to_f32().unwrap() / norm_product;
+		let dot = to_f32_or_exit(u.dot(v.clone()), "vector::angle_cos");
+		return dot / norm_product;
 	}
 
 	pub fn cross_product(u: &Vector<K, 3>, v: &Vector<K, 3>) -> Vector<K, 3> {
@@ -138,7 +142,7 @@ impl<K: Scalar, const N: usize> Vector<K, N> {
 	}
 }
 
-impl<K: Scalar, const N: usize> Add for Vector<K, N> {
+impl<K: Field, const N: usize> Add for Vector<K, N> {
 	type Output = Self;
 
 	fn add(self, v: Self) -> Self::Output {
@@ -152,7 +156,7 @@ impl<K: Scalar, const N: usize> Add for Vector<K, N> {
 	}
 }
 
-impl<K: Scalar, const N: usize> AddAssign for Vector<K, N> {
+impl<K: Field, const N: usize> AddAssign for Vector<K, N> {
 	fn add_assign(&mut self, v: Self) {
 		for i in 0..N {
 			self.data[i] += v.data[i];
@@ -160,7 +164,7 @@ impl<K: Scalar, const N: usize> AddAssign for Vector<K, N> {
 	}
 }
 
-impl<K: Scalar, const N: usize> Sub for Vector<K, N> {
+impl<K: Field, const N: usize> Sub for Vector<K, N> {
 	type Output = Self;
 
 	fn sub(self, v: Self) -> Self::Output {
@@ -174,7 +178,7 @@ impl<K: Scalar, const N: usize> Sub for Vector<K, N> {
 	}
 }
 
-impl<K: Scalar, const N: usize> SubAssign for Vector<K, N> {
+impl<K: Field, const N: usize> SubAssign for Vector<K, N> {
 	fn sub_assign(&mut self, v: Self) {
 		for i in 0..N {
 			self.data[i] -= v.data[i];
@@ -182,7 +186,7 @@ impl<K: Scalar, const N: usize> SubAssign for Vector<K, N> {
 	}
 }
 
-impl<K: Scalar, const N: usize> Mul<K> for Vector<K, N> {
+impl<K: Field, const N: usize> Mul<K> for Vector<K, N> {
 	type Output = Self;
 
 	fn mul(self, a: K) -> Self::Output {
@@ -196,7 +200,7 @@ impl<K: Scalar, const N: usize> Mul<K> for Vector<K, N> {
 	}
 }
 
-impl<K: Scalar, const N: usize> MulAssign<K> for Vector<K, N> {
+impl<K: Field, const N: usize> MulAssign<K> for Vector<K, N> {
 	fn mul_assign(&mut self, a: K) {
 		for i in 0..N {
 			self.data[i] *= a;

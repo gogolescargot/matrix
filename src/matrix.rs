@@ -1,6 +1,7 @@
 use std::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
-use crate::scalar::Scalar;
+use crate::field::Field;
+use crate::utils::to_f32_or_exit;
 use crate::vector::Vector;
 
 pub struct Matrix<K, const M: usize, const N: usize> {
@@ -10,13 +11,13 @@ pub struct Matrix<K, const M: usize, const N: usize> {
 	pub is_square: bool,
 }
 
-impl<K: Scalar, const M: usize, const N: usize> From<[[K; N]; M]> for Matrix<K, M, N> {
+impl<K: Field, const M: usize, const N: usize> From<[[K; N]; M]> for Matrix<K, M, N> {
 	fn from(data: [[K; N]; M]) -> Self {
 		Self::new(data)
 	}
 }
 
-impl<K: Scalar, const M: usize, const N: usize> Matrix<K, M, N> {
+impl<K: Field, const M: usize, const N: usize> Matrix<K, M, N> {
 	pub fn new(data: [[K; N]; M]) -> Self {
 		let size_y = M;
 		let size_x = N;
@@ -115,9 +116,9 @@ impl<K: Scalar, const M: usize, const N: usize> Matrix<K, M, N> {
 
 			let mut max_row = pivot_row;
 			for i in pivot_row + 1..M {
-				if result.data[i][col].to_f32().unwrap().abs()
-					> result.data[max_row][col].to_f32().unwrap().abs()
-				{
+				let a = to_f32_or_exit(result.data[i][col], "matrix::row_echelon");
+				let b = to_f32_or_exit(result.data[max_row][col], "matrix::row_echelon");
+				if a.abs() > b.abs() {
 					max_row = i;
 				}
 			}
@@ -177,7 +178,7 @@ impl<K: Scalar, const M: usize, const N: usize> Matrix<K, M, N> {
 	}
 }
 
-impl<K: Scalar + Neg<Output = K>, const N: usize> Matrix<K, N, N> {
+impl<K: Field + Neg<Output = K>, const N: usize> Matrix<K, N, N> {
 	pub fn trace(&self) -> K {
 		let mut result = K::default();
 
@@ -255,9 +256,9 @@ impl<K: Scalar + Neg<Output = K>, const N: usize> Matrix<K, N, N> {
 			let mut max_row: usize = pivot_row;
 
 			for i in pivot_row + 1..N {
-				if base.data[i][col].to_f32().unwrap().abs()
-					> base.data[max_row][col].to_f32().unwrap().abs()
-				{
+				let a = to_f32_or_exit(base.data[i][col], "matrix::inverse");
+				let b = to_f32_or_exit(base.data[max_row][col], "matrix::inverse");
+				if a.abs() > b.abs() {
 					max_row = i;
 				}
 			}
@@ -302,7 +303,7 @@ impl<K: Scalar + Neg<Output = K>, const N: usize> Matrix<K, N, N> {
 	}
 }
 
-impl<K: Scalar, const M: usize, const N: usize> Add for Matrix<K, M, N> {
+impl<K: Field, const M: usize, const N: usize> Add for Matrix<K, M, N> {
 	type Output = Self;
 
 	fn add(self, v: Self) -> Self::Output {
@@ -318,7 +319,7 @@ impl<K: Scalar, const M: usize, const N: usize> Add for Matrix<K, M, N> {
 	}
 }
 
-impl<K: Scalar, const M: usize, const N: usize> AddAssign for Matrix<K, M, N> {
+impl<K: Field, const M: usize, const N: usize> AddAssign for Matrix<K, M, N> {
 	fn add_assign(&mut self, v: Self) {
 		for i in 0..M {
 			for j in 0..N {
@@ -328,7 +329,7 @@ impl<K: Scalar, const M: usize, const N: usize> AddAssign for Matrix<K, M, N> {
 	}
 }
 
-impl<K: Scalar, const M: usize, const N: usize> Sub for Matrix<K, M, N> {
+impl<K: Field, const M: usize, const N: usize> Sub for Matrix<K, M, N> {
 	type Output = Self;
 
 	fn sub(self, v: Self) -> Self::Output {
@@ -344,7 +345,7 @@ impl<K: Scalar, const M: usize, const N: usize> Sub for Matrix<K, M, N> {
 	}
 }
 
-impl<K: Scalar, const M: usize, const N: usize> SubAssign for Matrix<K, M, N> {
+impl<K: Field, const M: usize, const N: usize> SubAssign for Matrix<K, M, N> {
 	fn sub_assign(&mut self, v: Self) {
 		for i in 0..M {
 			for j in 0..N {
@@ -354,7 +355,7 @@ impl<K: Scalar, const M: usize, const N: usize> SubAssign for Matrix<K, M, N> {
 	}
 }
 
-impl<K: Scalar, const M: usize, const N: usize> Mul<K> for Matrix<K, M, N> {
+impl<K: Field, const M: usize, const N: usize> Mul<K> for Matrix<K, M, N> {
 	type Output = Self;
 
 	fn mul(self, a: K) -> Self::Output {
@@ -370,7 +371,7 @@ impl<K: Scalar, const M: usize, const N: usize> Mul<K> for Matrix<K, M, N> {
 	}
 }
 
-impl<K: Scalar, const M: usize, const N: usize> MulAssign<K> for Matrix<K, M, N> {
+impl<K: Field, const M: usize, const N: usize> MulAssign<K> for Matrix<K, M, N> {
 	fn mul_assign(&mut self, a: K) {
 		for i in 0..M {
 			for j in 0..N {
@@ -380,7 +381,7 @@ impl<K: Scalar, const M: usize, const N: usize> MulAssign<K> for Matrix<K, M, N>
 	}
 }
 
-impl<K: Scalar, const M: usize, const N: usize, const P: usize> Mul<Matrix<K, N, P>>
+impl<K: Field, const M: usize, const N: usize, const P: usize> Mul<Matrix<K, N, P>>
 	for Matrix<K, M, N>
 {
 	type Output = Matrix<K, M, P>;
@@ -399,7 +400,7 @@ impl<K: Scalar, const M: usize, const N: usize, const P: usize> Mul<Matrix<K, N,
 	}
 }
 
-impl<K: Scalar, const M: usize, const N: usize> Mul<Vector<K, N>> for Matrix<K, M, N> {
+impl<K: Field, const M: usize, const N: usize> Mul<Vector<K, N>> for Matrix<K, M, N> {
 	type Output = Matrix<K, M, 1>;
 
 	fn mul(self, v: Vector<K, N>) -> Matrix<K, M, 1> {

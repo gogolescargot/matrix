@@ -3,7 +3,7 @@ use std::default::Default;
 use std::fmt::Debug;
 use std::ops::{AddAssign, DivAssign, MulAssign, Neg, SubAssign};
 
-pub trait Scalar:
+pub trait Field:
 	Num
 	+ Default
 	+ One
@@ -20,7 +20,7 @@ pub trait Scalar:
 {
 }
 
-impl<T> Scalar for T where
+impl<T> Field for T where
 	T: Num
 		+ Default
 		+ One

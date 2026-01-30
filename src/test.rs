@@ -420,7 +420,7 @@ fn test_matrix_subtraction() {
 }
 
 #[test]
-fn test_matrix_scalar_multiplication() {
+fn test_matrix_field_multiplication() {
 	let mut m1 = Matrix::new([[1., 2.], [3., 4.]]);
 	Matrix::scl(&mut m1, 2.);
 	cmp_matrix(&m1, &Matrix::new([[2., 4.], [6., 8.]]));

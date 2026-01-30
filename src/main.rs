@@ -3,8 +3,9 @@
 #[cfg(test)]
 mod test;
 
+mod field;
 mod matrix;
-mod scalar;
+mod utils;
 mod vector;
 
 use std::ops::{Add, Mul};
@@ -14,7 +15,7 @@ where
 	V: Mul<f32, Output = V> + Add<Output = V>,
 {
 	if t < 0. || t > 1. {
-		panic!("Scalar need to be between 0 and 1")
+		panic!("Field need to be between 0 and 1")
 	}
 
 	return u * (1. - t) + v * t;
